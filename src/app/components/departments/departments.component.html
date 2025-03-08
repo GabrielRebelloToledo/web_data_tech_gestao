@@ -1,0 +1,22 @@
+<app-head></app-head>
+<a class="btn btn-success mb-1 mt-2" style="margin-left: 10px;" (click)="openDynamicForm()">Novo Departamento</a>
+<table class="table table-hover table-responsible">
+    <thead>
+        <tr>
+            <th scope="col">Cód. Departamento</th>
+            <th scope="col">Nome</th>
+            <th scope="col">Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let dep of departments">
+            <th scope="row">{{dep.id}}</th>
+            <td>{{dep.department}}</td>
+            <td>
+                 <i style="margin-right: 5px;">
+                    <i class="fa fa-trash" style="cursor: pointer;" (click)="deleteDepartment(dep.id)"></i>
+                </i> 
+            </td>
+        </tr>
+    </tbody>
+</table>

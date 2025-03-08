@@ -1,0 +1,21 @@
+li{
+    margin-left: 50px;
+}
+
+a{
+    color: rgb(38, 38, 166);
+    font-weight: bold;
+    cursor: pointer;
+}
+
+
+
+  
+
+.img-logo {
+    max-width: 100%;                  /* Garante que o logo se ajuste ao tamanho do container */
+    height: auto;                     /* Mantém a proporção original da imagem */
+    display: block;                   /* Remove espaços indesejados abaixo da imagem */
+    margin: 0 auto;                   /* Centraliza a imagem horizontalmente */
+    object-fit: contain;              /* Garante que a imagem seja exibida sem distorção */
+}

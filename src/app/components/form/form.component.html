@@ -1,0 +1,44 @@
+<div class=" p-5">
+    <p><i class="fa fa-times action-icon pointer" (click)="fechar()"></i></p>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf="tabs.length">
+        <mat-tab-group>
+            <mat-tab *ngFor="let tab of tabs" [label]="tab.title">
+                <div class="grid grid-cols-{{ tab.columns }} gap-1">
+                    <div *ngFor="let field of tab.fields" class="p-2">
+
+                        <label class="form-label" hidden="{{field.visible}}">{{ field.placeholder }}</label>
+                        
+                        <input class="form-control"
+                            *ngIf="field.type !== 'select' && field.type !== 'check' && field.type !== 'file' &&  field.type !== 'txtarea'" 
+                            [type]="field.type" formControlName="{{ field.name }}"
+                            placeholder="{{ field.placeholder }}" hidden="{{field.visible}}">
+
+                        <textarea  class="form-control" *ngIf="field.type === 'txtarea'" formControlName="{{ field.name }}"></textarea>
+
+                        <div *ngIf="field.type === 'file'" class="custom-file-upload" hidden="{{field.visible}}">
+                            <i class="fa fa-upload action-icon" (click)="triggerFileInput(field.name)"></i>
+                            <input type="text" class="file-display" [id]="'file-input-2' + field.name" [value]="uploadedFiles[field.name] || 'Selecione um arquivo'" readonly (click)="onDownloadFile(field.name)"/>
+                            <!-- <i class="fa fa-download action-icon"  *ngIf="uploadedFiles[field.name]" (click)="onDownloadFile(field.name)"></i> -->
+                            <i class="fa fa-times action-icon"  *ngIf="uploadedFiles[field.name]"  (click)="onDeleteFile(field.name)"></i>
+                            <input type="file" [id]="'file-input-' + field.name" [formControlName]="field.name" (change)="onFileSelected($event, field.name)" hidden>
+                        </div>
+                        
+
+                        <select *ngIf="field.type === 'select'" formControlName="{{ field.name }}" class="form-select" hidden="{{field.visible}}">
+                            <option *ngFor="let option of options[field.name]" [value]="option.id">{{ option.name || option.situation}}
+                            </option>
+                        </select>
+
+                        <div class=" form-check" *ngIf="field.type == 'check'" hidden="{{field.visible}}">
+                            <input type="checkbox" class="form-check-input" formControlName="{{ field.name }}">
+                        </div>
+                    </div>
+                </div>
+
+
+            </mat-tab>
+        </mat-tab-group>
+        <button type="submit" class="btn btn-success">Enviar</button>
+    </form>
+
+</div>

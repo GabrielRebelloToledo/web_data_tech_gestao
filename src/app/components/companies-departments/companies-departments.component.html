@@ -1,0 +1,27 @@
+<!-- <a class="btn btn-success mb-1 mt-2" style="margin-left: 10px;" (click)="openDynamicForm()">Nova Empresa</a>
+ -->
+ <p style="margin-left: 15px; cursor: pointer;"><i class="fa fa-times action-icon pointer" (click)="fechar()"></i></p>
+
+ <a class="btn btn-success"(click)="pesquisaEmpresasDepartamentos()">Novo Departamento</a>
+<div class="container-fluid mt-3">
+    <table class="table table-hover table-responsible">
+        <thead>
+            <tr>
+                <th scope="col">Cód. Departamento</th>
+                <th scope="col">Departamento</th>
+                <th scope="col">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let comd of companiesdep">
+                <th scope="row">{{comd.departmentId}}</th>
+                <td>{{comd.department?.department}}</td>
+                <td>
+                    <i style="margin-right: 5px;">
+                        <i class="bi-people" style="cursor: pointer;" (click)="vincularusuario(comd.departmentId, comd.companieId)"></i>
+                    </i> 
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

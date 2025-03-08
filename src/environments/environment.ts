@@ -1,0 +1,5 @@
+export const environment = {
+    production: true,
+   //BASE_URL: 'http://localhost:3000/api/'
+    BASE_URL: 'https://api.gestao.datatechsistemas.com.br:3000/api/'
+  };

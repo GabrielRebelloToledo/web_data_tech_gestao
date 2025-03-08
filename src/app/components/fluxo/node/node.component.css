@@ -1,0 +1,36 @@
+.node {
+    width: 150px;
+    height:20%;
+    border: 1px solid black;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+   
+    cursor: pointer;
+    color: #FFFF;
+    font-size:0.7rem;
+  }
+  
+  .node-content {
+    text-align: center;
+  }
+  
+
+  @media (max-width: 480px) {
+    .node{
+      font-size: 0.7rem;
+      
+    }
+}
+
+
+.full-screen-dialog .mat-dialog-container {
+  padding: 0;      /* Remove o padding padrão */
+  margin: 0;       /* Remove a margem, se houver */
+  height: 80vh;   /* Garante que o container ocupe toda a altura */
+  width: 80vw;    /* Garante que o container ocupe toda a largura */
+  max-height: 80vh;
+  max-width: 80vw;
+  border-radius: 0; /* Remove cantos arredondados, se desejar */
+}

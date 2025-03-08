@@ -1,0 +1,9 @@
+<div class="node" [ngStyle]="{'background-color': node.color}">
+    <div class="node-content" (click)="openDynamicForm(node)">
+      <strong >{{ node.label }}</strong><br />
+      <small>Criado em: {{ node.createdAt }}</small><br />
+      <small>Fechado em: {{ node.closedAt || 'Ainda aberto' }}</small>
+     <a class="btn"><i class="fa fa-pencil" (click)="openDynamicForm(node)"></i> </a> 
+    </div>
+    
+  </div>

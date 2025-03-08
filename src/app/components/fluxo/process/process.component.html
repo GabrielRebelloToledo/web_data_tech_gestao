@@ -1,0 +1,10 @@
+
+<div class="process-container">
+    <h3>Processo {{ processId }} - Data Pasteurização {{ dataPast }} - Data Envase {{ dataEnv }}</h3>
+    <div class="nodes-container">
+      <div class="node" *ngFor="let node of nodes; let i = index" [ngClass]="{'with-arrow': i < nodes.length - 1}">
+        <app-node [node]="node"></app-node>
+      </div>
+    </div>
+  </div>
+  
