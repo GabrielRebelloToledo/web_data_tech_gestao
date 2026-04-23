@@ -1,0 +1,65 @@
+/* Estilos gerais para o card */
+.form-container {
+   /*  max-width: 600px; */
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    background-color: #fff;
+    margin: 30px;
+    /* width: 100px; */
+    /* Remover margin auto, pois pode afetar a centralização */
+}
+
+mat-card-title {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    font-weight: bold;
+}
+
+/* Estilos para os campos de formulário */
+.form-field {
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+/* Estilos para o botão de ação */
+.buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+/* Estilos para botões */
+.action-btn {
+    padding: 0.7rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+
+mat-error {
+    font-size: 0.875rem;
+    color: #d32f2f;
+}
+
+/* Adiciona espaçamento e bordas suaves nos campos */
+mat-form-field {
+    border-radius: 4px;
+}
+
+/* Responsividade */
+@media (max-width: 600px) {
+    .form-container {
+        padding: 1rem;
+    }
+
+    mat-card-title {
+        font-size: 1.25rem;
+    }
+
+    .buttons {
+        flex-direction: column;
+        align-items: flex-end;
+    }
+}

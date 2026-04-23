@@ -1,27 +1,99 @@
-<div class="d-flex justify-content-center align-items-center vh-100 bg-light">
-    <div class="card shadow-lg p-4 rounded" style="width: 350px;">
-        <div class="text-center mb-4">
-            <h4 class="fw-bold text-primary">Acesso ao Sistema</h4>
-            <p class="text-muted">Entre com suas credenciais</p>
-        </div>
-        <form [formGroup]="loginForm">
-            <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                    <input type="text" class="form-control" id="email" placeholder="email@example.com" formControlName="email">
-                </div>
-            </div>
-            <div class="mb-3">
-                <label for="password" class="form-label">Senha</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="bi bi-lock"></i></span>
-                    <input type="password" class="form-control" id="password" placeholder="••••••••" formControlName="password">
-                </div>
-            </div>
-            <div class="d-grid">
-                <button class="btn btn-primary" (click)="login()">Acessar</button>
-            </div>
-        </form>
+<div class="auth">
+  <!-- Left: brand -->
+  <aside class="auth__brand" aria-hidden="true">
+    <div class="auth__brand-content">
+      <div class="auth__brand-logo">
+        <img src="DATATECH.png" alt="DataTech Sistemas" />
+      </div>
+      <h1 class="auth__brand-title">Gestão de Chamados <span class="auth__brand-title-accent">DataTech Sistemas</span></h1>
+      <p class="auth__brand-subtitle">
+        Centralize atendimentos, acompanhe o ciclo de vida de cada chamado e entregue
+        experiência impecável aos seus clientes.
+      </p>
+
+      <ul class="auth__features">
+        <li>
+          <span class="material-symbols-rounded">bolt</span>
+          <div>
+            <strong>Resposta ágil</strong>
+            <span>Priorize e capture chamados em um clique</span>
+          </div>
+        </li>
+        <li>
+          <span class="material-symbols-rounded">insights</span>
+          <div>
+            <strong>Visão em tempo real</strong>
+            <span>Acompanhe pendentes, andamento e SLA</span>
+          </div>
+        </li>
+        <li>
+          <span class="material-symbols-rounded">verified_user</span>
+          <div>
+            <strong>Seguro e auditável</strong>
+            <span>Histórico completo por chamado</span>
+          </div>
+        </li>
+      </ul>
     </div>
+
+    <div class="auth__brand-footer">
+      © {{ year }} DataTech Sistemas
+    </div>
+
+    <!-- decorative blobs -->
+    <div class="auth__blob auth__blob--one" aria-hidden="true"></div>
+    <div class="auth__blob auth__blob--two" aria-hidden="true"></div>
+  </aside>
+
+  <!-- Right: form -->
+  <main class="auth__main">
+    <div class="auth__card">
+      <div class="auth__mobile-brand">
+        <img src="DATATECH.png" alt="DataTech Sistemas" />
+      </div>
+
+      <header class="auth__header">
+        <h2>Bem-vindo de volta</h2>
+        <p>Faça login para acessar sua área de chamados</p>
+      </header>
+
+      <form [formGroup]="loginForm" (ngSubmit)="login()" class="auth__form" novalidate>
+        <label class="field">
+          <span class="field__label">E-mail</span>
+          <div class="field__control">
+            <span class="field__icon material-symbols-rounded">mail</span>
+            <input type="email" formControlName="email" placeholder="voce@empresa.com.br" autocomplete="email" />
+          </div>
+        </label>
+
+        <label class="field">
+          <span class="field__label">Senha</span>
+          <div class="field__control">
+            <span class="field__icon material-symbols-rounded">lock</span>
+            <input [type]="showPassword ? 'text' : 'password'" formControlName="password" placeholder="••••••••" autocomplete="current-password" />
+            <button type="button" class="field__toggle" (click)="showPassword = !showPassword" [attr.aria-label]="showPassword ? 'Ocultar senha' : 'Mostrar senha'">
+              <span class="material-symbols-rounded">{{ showPassword ? 'visibility_off' : 'visibility' }}</span>
+            </button>
+          </div>
+        </label>
+
+        <div class="auth__error" *ngIf="erroLogin" role="alert">
+          <span class="material-symbols-rounded">error</span>
+          <span>{{ erroMessage }}</span>
+        </div>
+
+        <button type="submit" class="auth__submit" [disabled]="spinner">
+          <span *ngIf="!spinner" class="auth__submit-label">
+            Acessar sistema
+            <span class="material-symbols-rounded">arrow_forward</span>
+          </span>
+          <mat-spinner *ngIf="spinner" diameter="22"></mat-spinner>
+        </button>
+      </form>
+
+      <footer class="auth__footer">
+        <span>Precisa de acesso?</span> Fale com o administrador do sistema.
+      </footer>
+    </div>
+  </main>
 </div>

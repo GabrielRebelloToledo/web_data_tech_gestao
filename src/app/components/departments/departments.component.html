@@ -1,22 +1,66 @@
-<app-head></app-head>
-<a class="btn btn-success mb-1 mt-2" style="margin-left: 10px;" (click)="openDynamicForm()">Novo Departamento</a>
-<table class="table table-hover table-responsible">
-    <thead>
-        <tr>
-            <th scope="col">Cód. Departamento</th>
-            <th scope="col">Nome</th>
-            <th scope="col">Ações</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr *ngFor="let dep of departments">
-            <th scope="row">{{dep.id}}</th>
-            <td>{{dep.department}}</td>
-            <td>
-                 <i style="margin-right: 5px;">
-                    <i class="fa fa-trash" style="cursor: pointer;" (click)="deleteDepartment(dep.id)"></i>
-                </i> 
-            </td>
-        </tr>
-    </tbody>
-</table>
+<app-shell activePage="departments" pageTitle="Departamentos"
+           [breadcrumbs]="[{label:'Administração'},{label:'Departamentos'}]">
+
+  <section class="list-page">
+    <header class="list-page__header">
+      <div>
+        <h2 class="list-page__title">Departamentos</h2>
+        <p class="list-page__subtitle">Gerencie os departamentos disponíveis para os chamados.</p>
+      </div>
+      <div class="list-page__actions">
+        <label class="search">
+          <span class="material-symbols-rounded icon-sm">search</span>
+          <input type="search"
+                 placeholder="Buscar por nome…"
+                 [ngModel]="searchTerm()"
+                 (ngModelChange)="onSearchChange($event)" />
+        </label>
+        <button class="icon-btn" (click)="pesquisaDepartamentos()" title="Atualizar" aria-label="Atualizar">
+          <span class="material-symbols-rounded icon-md">refresh</span>
+        </button>
+        <button class="btn-primary-brand" (click)="openDynamicForm()">
+          <span class="material-symbols-rounded icon-sm">add</span>
+          Novo departamento
+        </button>
+      </div>
+    </header>
+
+    <!-- Loading -->
+    <div class="list-page__skeleton card-surface" *ngIf="loading()">
+      <div class="skeleton-row" *ngFor="let i of [0,1,2,3,4]">
+        <app-skeleton width="60px" height="18px"></app-skeleton>
+        <app-skeleton width="60%" height="18px"></app-skeleton>
+        <app-skeleton width="80px" height="18px"></app-skeleton>
+      </div>
+    </div>
+
+    <!-- Empty -->
+    <div class="card-surface list-page__empty" *ngIf="!loading() && departments().length === 0">
+      <app-empty-state
+        icon="account_tree"
+        title="Nenhum departamento cadastrado"
+        description="Use o botão Novo departamento para iniciar o cadastro.">
+      </app-empty-state>
+    </div>
+
+    <!-- Grid -->
+    <div class="list-page__grid card-surface" *ngIf="!loading() && departments().length">
+      <ag-grid-angular
+        class="admin-ag-grid"
+        [rowData]="departments()"
+        [columnDefs]="colDefs"
+        [defaultColDef]="defaultColDef"
+        [theme]="gridTheme()"
+        [localeText]="localeText"
+        [rowHeight]="56"
+        [headerHeight]="48"
+        [animateRows]="true"
+        [pagination]="true"
+        [paginationPageSize]="15"
+        [paginationPageSizeSelector]="[10, 15, 25, 50, 100]"
+        [suppressCellFocus]="true"
+        (gridReady)="onGridReady($event)">
+      </ag-grid-angular>
+    </div>
+  </section>
+</app-shell>

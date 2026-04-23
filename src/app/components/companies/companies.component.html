@@ -1,33 +1,75 @@
-<app-head paginaAtiva="home"></app-head>
-<a class="btn btn-success mb-1 mt-2" style="margin-left: 10px;" (click)="openDynamicForm()">Nova Empresa</a>
+<app-shell activePage="companies" pageTitle="Empresas"
+           [breadcrumbs]="[{label:'Administração'},{label:'Empresas'}]">
 
-<table class="table table-hover table-responsible">
-    <thead>
-        <tr>
-            <th scope="col">Cód. Empresa</th>
-            <th scope="col">Nome</th>
-            <th scope="col">CNPJ</th>
-            <th scope="col">Endereço</th>
-            <th scope="col">E-mail</th>
-            <th scope="col">Telefone</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr *ngFor="let comp of companies">
-            <th scope="row">{{comp.id}}</th>
-            <td>{{comp.name}}</td>
-            <td>{{comp.cnpj}}</td>
-            <td>{{comp.adress}}</td>
-            <td>{{comp.email}}</td>
-            <td>{{comp.telephone}}</td>
-            <td>
-                <i style="margin-right: 5px;">
-                    <i class="bi-building" style="cursor: pointer;" (click)="cadastroDepartamentos(comp.id)"></i>
-                </i> 
-                <i style="margin-right: 5px;">
-                    <i class="fa fa-trash" style="cursor: pointer;" (click)="deleteCompanie(comp.id)"></i>
-                </i> 
-            </td>
-        </tr>
-    </tbody>
-</table>
+  <section class="list-page">
+    <header class="list-page__header">
+      <div>
+        <h2 class="list-page__title">Empresas</h2>
+        <p class="list-page__subtitle">Cadastro das empresas atendidas e seus departamentos.</p>
+      </div>
+      <div class="list-page__actions">
+        <label class="search">
+          <span class="material-symbols-rounded icon-sm">search</span>
+          <input type="search"
+                 placeholder="Buscar por nome, CNPJ, e-mail..."
+                 [ngModel]="searchTerm()"
+                 (ngModelChange)="onSearchChange($event)" />
+        </label>
+        <button class="icon-btn" (click)="pesquisaEmpresas()" title="Atualizar" aria-label="Atualizar">
+          <span class="material-symbols-rounded icon-md">refresh</span>
+        </button>
+        <button class="btn-primary-brand" (click)="openDynamicForm()">
+          <span class="material-symbols-rounded icon-sm">add</span>
+          Nova empresa
+        </button>
+      </div>
+    </header>
+
+    <!-- Loading -->
+    <div class="list-page__skeleton card-surface" *ngIf="loading()">
+      <div class="skeleton-row" *ngFor="let i of [0,1,2,3,4]">
+        <app-skeleton width="60px" height="18px"></app-skeleton>
+        <app-skeleton width="25%" height="18px"></app-skeleton>
+        <app-skeleton width="20%" height="18px"></app-skeleton>
+        <app-skeleton width="25%" height="18px"></app-skeleton>
+        <app-skeleton width="15%" height="18px"></app-skeleton>
+      </div>
+    </div>
+
+    <!-- Empty -->
+    <div class="card-surface list-page__empty" *ngIf="!loading() && companies().length === 0">
+      <app-empty-state
+        icon="business"
+        title="Nenhuma empresa cadastrada"
+        description="Use o botão Nova empresa para iniciar o cadastro.">
+      </app-empty-state>
+    </div>
+
+    <!-- Grid -->
+    <div class="list-page__grid card-surface" *ngIf="!loading() && companies().length">
+      <ag-grid-angular
+        class="admin-ag-grid"
+        [rowData]="companies()"
+        [columnDefs]="colDefs"
+        [defaultColDef]="defaultColDef"
+        [theme]="gridTheme()"
+        [localeText]="localeText"
+        [rowHeight]="56"
+        [headerHeight]="48"
+        [animateRows]="true"
+        [pagination]="true"
+        [paginationPageSize]="15"
+        [paginationPageSizeSelector]="[10, 15, 25, 50, 100]"
+        [suppressCellFocus]="true"
+        (gridReady)="onGridReady($event)">
+      </ag-grid-angular>
+    </div>
+  </section>
+
+  <app-company-linkage-drawer
+    [open]="drawerOpen()"
+    [companyId]="selectedCompany()?.id"
+    [companyName]="selectedCompany()?.name"
+    (closed)="closeLinkageDrawer()">
+  </app-company-linkage-drawer>
+</app-shell>

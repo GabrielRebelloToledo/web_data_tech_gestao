@@ -1,0 +1,116 @@
+<app-drawer
+  [open]="open"
+  eyebrow="Vínculos da empresa"
+  [title]="companyName || 'Empresa'"
+  subtitle="Gerencie departamentos atendidos e seus atendentes."
+  (close)="close()">
+
+  <div class="linkage-head">
+    <div class="linkage-head__stat">
+      <span class="material-symbols-rounded icon-sm">account_tree</span>
+      <span>{{ links().length }} {{ links().length === 1 ? 'departamento' : 'departamentos' }}</span>
+    </div>
+    <button class="btn-primary-brand btn-sm" (click)="showAddDept.set(!showAddDept())" *ngIf="!showAddDept()">
+      <span class="material-symbols-rounded icon-sm">add</span>
+      Vincular departamento
+    </button>
+  </div>
+
+  <!-- Add department form -->
+  <div class="linkage-form" *ngIf="showAddDept()">
+    <label class="linkage-form__label">Selecione um departamento</label>
+    <div class="linkage-form__row">
+      <app-combobox
+        [options]="availableDepartments()"
+        labelKey="department"
+        [value]="selectedDeptId"
+        (valueChange)="selectedDeptId = $event"
+        placeholder="Escolha um departamento…"
+        searchPlaceholder="Buscar departamento…"
+        [emptyMessage]="availableDepartments().length === 0 ? 'Todos os departamentos já estão vinculados' : 'Nenhum departamento encontrado'">
+      </app-combobox>
+      <button class="btn-primary-brand btn-sm" (click)="addDepartment()" [disabled]="!selectedDeptId">
+        <span class="material-symbols-rounded icon-sm">check</span>
+        Salvar
+      </button>
+      <button class="btn-ghost btn-sm" (click)="showAddDept.set(false); selectedDeptId = ''">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="linkage-skeleton" *ngIf="loading()">
+    <app-skeleton height="56px"></app-skeleton>
+    <app-skeleton height="56px"></app-skeleton>
+    <app-skeleton height="56px"></app-skeleton>
+  </div>
+
+  <!-- Empty -->
+  <app-empty-state
+    *ngIf="!loading() && links().length === 0 && !showAddDept()"
+    icon="account_tree"
+    title="Sem departamentos vinculados"
+    description="Vincule um departamento para que esta empresa possa abrir chamados.">
+  </app-empty-state>
+
+  <!-- Dept accordion list -->
+  <ul class="dept-list" *ngIf="!loading() && links().length">
+    <li class="dept-item" *ngFor="let link of links()">
+      <button class="dept-item__head" (click)="toggleExpand(link)" [attr.aria-expanded]="link.expanded">
+        <span class="material-symbols-rounded icon-sm dept-item__chev" [class.dept-item__chev--open]="link.expanded">chevron_right</span>
+        <span class="dept-item__name">{{ link.department?.department || ('Depto #' + link.departmentId) }}</span>
+        <span class="dept-item__count" *ngIf="link.users">{{ link.users.length }} {{ link.users.length === 1 ? 'usuário' : 'usuários' }}</span>
+      </button>
+
+      <div class="dept-item__body" *ngIf="link.expanded">
+
+        <div class="loading-row" *ngIf="link.loadingUsers">
+          <app-skeleton height="36px"></app-skeleton>
+          <app-skeleton height="36px"></app-skeleton>
+        </div>
+
+        <div class="users-empty" *ngIf="!link.loadingUsers && (!link.users || link.users.length === 0)">
+          Nenhum atendente vinculado ainda.
+        </div>
+
+        <ul class="user-list" *ngIf="!link.loadingUsers && link.users && link.users.length">
+          <li class="user-chip" *ngFor="let bind of link.users">
+            <span class="user-chip__avatar">{{ (bind.user?.name || '?') | slice:0:1 }}</span>
+            <div class="user-chip__meta">
+              <strong>{{ bind.user?.name || ('Usuário #' + bind.userId) }}</strong>
+              <span *ngIf="bind.user?.email">{{ bind.user.email }}</span>
+            </div>
+            <button class="row-action row-action--danger" title="Remover" (click)="removeUser(link, bind)">
+              <span class="material-symbols-rounded icon-sm">close</span>
+            </button>
+          </li>
+        </ul>
+
+        <!-- Add user form -->
+        <div class="linkage-form linkage-form--nested" *ngIf="link.showAddUser">
+          <label class="linkage-form__label">Vincular usuário</label>
+          <div class="linkage-form__row">
+            <app-combobox
+              [options]="availableUsersFor(link)"
+              labelKey="name"
+              [value]="link.selectedUserId"
+              (valueChange)="link.selectedUserId = $event"
+              placeholder="Escolha um usuário…"
+              searchPlaceholder="Buscar por nome…"
+              [emptyMessage]="availableUsersFor(link).length === 0 ? 'Todos os usuários já estão vinculados' : 'Nenhum usuário encontrado'">
+            </app-combobox>
+            <button class="btn-primary-brand btn-sm" (click)="addUser(link)" [disabled]="!link.selectedUserId">
+              <span class="material-symbols-rounded icon-sm">check</span>
+              Salvar
+            </button>
+            <button class="btn-ghost btn-sm" (click)="link.showAddUser = false; link.selectedUserId = ''">Cancelar</button>
+          </div>
+        </div>
+
+        <button class="btn-dashed" *ngIf="!link.showAddUser && !link.loadingUsers" (click)="link.showAddUser = true">
+          <span class="material-symbols-rounded icon-sm">person_add</span>
+          Adicionar atendente
+        </button>
+      </div>
+    </li>
+  </ul>
+</app-drawer>

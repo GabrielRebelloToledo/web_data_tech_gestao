@@ -1,1 +1,75 @@
-<p>users works!</p>
+<app-shell activePage="usuarios" pageTitle="Usuários"
+           [breadcrumbs]="[{label:'Administração'},{label:'Usuários'}]">
+
+  <section class="list-page">
+    <header class="list-page__header">
+      <div>
+        <h2 class="list-page__title">Usuários</h2>
+        <p class="list-page__subtitle">Cadastro de usuários, seus perfis e vínculos com empresas.</p>
+      </div>
+      <div class="list-page__actions">
+        <label class="search">
+          <span class="material-symbols-rounded icon-sm">search</span>
+          <input type="search"
+                 placeholder="Buscar por nome, e-mail, tipo..."
+                 [ngModel]="searchTerm()"
+                 (ngModelChange)="onSearchChange($event)" />
+        </label>
+        <button class="icon-btn" (click)="pesquisaUsuarios()" title="Atualizar" aria-label="Atualizar">
+          <span class="material-symbols-rounded icon-md">refresh</span>
+        </button>
+        <button class="btn-primary-brand" (click)="openCreateDialog()">
+          <span class="material-symbols-rounded icon-sm">person_add</span>
+          Novo usuário
+        </button>
+      </div>
+    </header>
+
+    <!-- Loading -->
+    <div class="list-page__skeleton card-surface" *ngIf="loading()">
+      <div class="skeleton-row" *ngFor="let i of [0,1,2,3,4]">
+        <app-skeleton width="60px" height="18px"></app-skeleton>
+        <app-skeleton width="25%" height="18px"></app-skeleton>
+        <app-skeleton width="30%" height="18px"></app-skeleton>
+        <app-skeleton width="20%" height="18px"></app-skeleton>
+        <app-skeleton width="15%" height="18px"></app-skeleton>
+      </div>
+    </div>
+
+    <!-- Empty -->
+    <div class="card-surface list-page__empty" *ngIf="!loading() && users().length === 0">
+      <app-empty-state
+        icon="group"
+        title="Nenhum usuário cadastrado"
+        description="Use o botão Novo usuário para iniciar o cadastro.">
+      </app-empty-state>
+    </div>
+
+    <!-- Grid -->
+    <div class="list-page__grid card-surface" *ngIf="!loading() && users().length">
+      <ag-grid-angular
+        class="admin-ag-grid"
+        [rowData]="users()"
+        [columnDefs]="colDefs"
+        [defaultColDef]="defaultColDef"
+        [theme]="gridTheme()"
+        [localeText]="localeText"
+        [rowHeight]="56"
+        [headerHeight]="48"
+        [animateRows]="true"
+        [pagination]="true"
+        [paginationPageSize]="15"
+        [paginationPageSizeSelector]="[10, 15, 25, 50, 100]"
+        [suppressCellFocus]="true"
+        (gridReady)="onGridReady($event)">
+      </ag-grid-angular>
+    </div>
+  </section>
+
+  <app-user-linkage-drawer
+    [open]="drawerOpen()"
+    [userId]="selectedUser()?.id"
+    [userName]="selectedUser()?.name"
+    (closed)="closeLinkageDrawer()">
+  </app-user-linkage-drawer>
+</app-shell>

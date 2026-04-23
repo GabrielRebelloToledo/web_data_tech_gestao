@@ -2,13 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { ProcessComponent } from "../process/process.component";
 import { Node, Project } from '../node/node.model';
 import { CommonModule } from '@angular/common';
-import { HeadComponent } from '../../head/head.component';
+import { ShellComponent } from '../../shell/shell.component';
 import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-graph',
   standalone: true,
-  imports: [ProcessComponent, CommonModule,HeadComponent, RouterModule],
+  imports: [ProcessComponent, CommonModule, ShellComponent, RouterModule],
   templateUrl: './graph.component.html',
   styleUrl: './graph.component.css'
 })

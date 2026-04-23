@@ -1,0 +1,34 @@
+<!-- Overlay escuro -->
+
+<div id="emailOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+  background-color: rgba(0, 0, 0, 0.75); z-index: 9999; display: flex; justify-content: center; align-items: center;">
+
+  <div style="position: relative; background: white; padding: 30px; border-radius: 12px; text-align: center; width: 300px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.4);">
+
+    <!-- Botão de fechar -->
+    <!-- <button (click)="fecharOverlay()" style="
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #666;
+      transition: color 0.2s ease;
+    " aria-label="Fechar"
+      onmouseover="this.style.color='#000'"
+      onmouseout="this.style.color='#666'">
+      &times;
+    </button> -->
+
+    <!-- LOADING -->
+
+    <div id="status-loading">
+      <div class="spinner" style="margin: 0 auto 20px;"></div>
+      <p>{{mensagemCarregamento}}</p>
+    </div>
+
+  </div>
+</div>

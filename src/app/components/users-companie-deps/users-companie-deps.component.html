@@ -1,32 +1,84 @@
-<!-- <a class="btn btn-success mb-1 mt-2" style="margin-left: 10px;" (click)="openDynamicForm()">Nova Empresa</a>
- -->
- <p style="margin-left: 15px; cursor: pointer;"><i class="fa fa-times action-icon pointer" (click)="fechar()"></i></p>
+<!-- Botão de Fechar -->
+<p style="margin-left: 15px; cursor: pointer;margin-top: 10px;">
+    <i class="fa fa-times action-icon pointer" (click)="fechar()"></i>
+</p>
 
-
- <a class="btn btn-success"(click)="pesquisaEmpresasDepartamentosUsuarios()">Novo Departamento</a>
-{{coddep}}
-{{codemp}}
- 
 <div class="container-fluid mt-3">
-    <table class="table table-hover table-responsible">
-        <thead>
-            <tr>
-                <th scope="col">Cód. Usuário</th>
-                <th scope="col">Nome Usuário</th>
-                <th scope="col">Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr *ngFor="let comd of companiesdepUser">
-                <th scope="row">{{comd.departmentId}}</th>
-                <td>{{comd.department?.department}}</td>
-                <!-- <td>
-                    <i style="margin-right: 5px;">
-                        <i class="bi-people" style="cursor: pointer;" (click)="vincularusuario(comd.departmentId, comd.companieId)"></i>
-                    </i> 
-                </td> -->
-            </tr>
-        </tbody>
-    </table>
-</div>
+    <div class="d-flex justify-content-between align-items-center">
+        <!-- Botões de Ação -->
+        <div>
+            <a class="btn btn-success" (click)="verFormulario()" *ngIf="table">
+                <i class="bi-plus-circle bi-3x" style="cursor: pointer;"></i>
+                Cadastrar Usuário
+            </a>
+            <a class="btn btn-warning" (click)="verUsuarios()" *ngIf="!table">
+                <i class="bi-table bi-3x" style="cursor: pointer;"></i>
+                Ver Usuários
+            </a>
+            <a class="btn btn-primary" (click)="pesquisaEmpresasDepartamentosUsuarios()" style="margin-left: 5px;">
+                <i class="bi-arrow-clockwise bi-3x" style="cursor: pointer;"></i>
+                Atualizar Dados
+            </a>
+        </div>
 
+        <!-- Carregando (Loading) -->
+        <div *ngIf="loading" class="d-flex align-items-center">
+            <span>Carregando...</span>
+            <div class="spinner-border spinner-border-sm ms-2" role="status">
+                <span class="visually-hidden">Carregando...</span>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="table" class="mt-3">
+        <!-- Tabela de Departamentos -->
+        <table class="table table-hover table-responsive">
+            <thead>
+                <tr>
+                    <th scope="col">Cód. Usuário</th>
+                    <th scope="col">Nome Usuário</th>
+                    <th scope="col">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let comd of companiesdepUser">
+                    <th scope="row">{{comd.userId}}</th>
+                    <td>{{comd.user?.name}}</td>
+                    <td>
+                        <i style="margin-right: 5px;">
+                            <i class="bi-trash" style="cursor: pointer;" (click)="delete(comd.idDepCompUser)"></i>
+                        </i> 
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div *ngIf="!table" class="w-50 mt-4">
+        <!-- Formulário de Cadastro de Departamento -->
+        <h6>Cadastrar Usuário no Departamento</h6>
+        <form [formGroup]="form" (ngSubmit)="vincularUsuarios()">
+            <div class="mb-3">
+                <label for="id" class="form-label">Número Único</label>
+                <input type="number" class="form-control" id="id" formControlName="idDepCompUser" readonly>
+            </div>
+
+            <div class="mb-3">
+                <label for="id" class="form-label">Número Único Empresa/Departamento</label>
+                <input type="number" class="form-control" id="id" formControlName="idDepartComp" readonly>
+            </div>
+
+
+            <div class="mb-3">
+                <label for="selectform" class="form-label">Usuário</label>
+                <select id="selectform" class="form-select form-select" aria-label="Small select example"
+                    formControlName="userId">
+                    <option value="" disabled selected>Abra o menu de seleção</option>
+                    <option *ngFor="let user of users" [value]="user.id">{{ user.name }}</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-success">Enviar</button>
+        </form>
+    </div>
+</div>

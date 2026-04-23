@@ -1,0 +1,18 @@
+<!-- Overlay escuro -->
+
+<div id="emailOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+  background-color: rgba(0, 0, 0, 0.75); z-index: 9999; display: flex; justify-content: center; align-items: center;">
+
+    <div style="position: relative; background: white; padding: 30px; border-radius: 12px; text-align: center; width: 300px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.4);">
+
+        <!-- ERRO -->
+        <div id="status-error">
+            <div style="font-size: 48px; color: red;">
+                <i class="fas fa-times-circle"></i>
+            </div>
+            <p style="margin-top: 30px;">{{ mensagem }}</p>
+        </div>
+
+    </div>
+</div>

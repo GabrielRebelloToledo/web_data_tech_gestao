@@ -1,0 +1,77 @@
+<div class="combobox" [class.combobox--open]="isOpen()" [class.combobox--disabled]="disabled">
+  <button
+    #trigger="cdkOverlayOrigin"
+    #triggerEl
+    cdkOverlayOrigin
+    type="button"
+    class="combobox__trigger"
+    [class.combobox__trigger--empty]="!selectedLabel()"
+    [disabled]="disabled"
+    [attr.aria-expanded]="isOpen()"
+    aria-haspopup="listbox"
+    (click)="toggle()">
+    <span class="combobox__value">{{ selectedLabel() || placeholder }}</span>
+    <span class="combobox__actions">
+      <span
+        *ngIf="value !== null && value !== undefined && value !== ''"
+        class="combobox__clear"
+        title="Limpar"
+        role="button"
+        (click)="clear($event)">
+        <span class="material-symbols-rounded">close</span>
+      </span>
+      <span class="material-symbols-rounded combobox__chev" [class.combobox__chev--open]="isOpen()">expand_more</span>
+    </span>
+  </button>
+</div>
+
+<ng-template
+  cdkConnectedOverlay
+  [cdkConnectedOverlayOrigin]="origin"
+  [cdkConnectedOverlayOpen]="isOpen()"
+  [cdkConnectedOverlayPositions]="positions"
+  [cdkConnectedOverlayHasBackdrop]="true"
+  cdkConnectedOverlayBackdropClass="combobox__overlay-backdrop"
+  [cdkConnectedOverlayWidth]="triggerWidth()"
+  [cdkConnectedOverlayFlexibleDimensions]="false"
+  [cdkConnectedOverlayGrowAfterOpen]="false"
+  [cdkConnectedOverlayPush]="true"
+  [cdkConnectedOverlayViewportMargin]="8"
+  (backdropClick)="closePanel()"
+  (detach)="closePanel()">
+  <div class="combobox__panel" role="listbox" [style.width.px]="triggerWidth()">
+    <div class="combobox__search">
+      <span class="material-symbols-rounded combobox__search-icon">search</span>
+      <input
+        #searchInput
+        type="text"
+        class="combobox__search-input"
+        [placeholder]="searchPlaceholder"
+        [ngModel]="query()"
+        (ngModelChange)="onSearch($event)"
+        (keydown)="onKeydown($event)" />
+    </div>
+
+    <ul class="combobox__list" *ngIf="filtered().length; else empty">
+      <li
+        *ngFor="let opt of filtered(); let i = index"
+        class="combobox__option"
+        [class.combobox__option--active]="isActive(i)"
+        [class.combobox__option--selected]="isSelected(opt)"
+        role="option"
+        [attr.aria-selected]="isSelected(opt)"
+        (mouseenter)="activeIndex.set(i)"
+        (click)="choose(opt)">
+        <span class="combobox__option-label">{{ getLabel(opt) }}</span>
+        <span class="material-symbols-rounded combobox__option-check" *ngIf="isSelected(opt)">check</span>
+      </li>
+    </ul>
+
+    <ng-template #empty>
+      <div class="combobox__empty">
+        <span class="material-symbols-rounded">search_off</span>
+        <span>{{ emptyMessage }}</span>
+      </div>
+    </ng-template>
+  </div>
+</ng-template>

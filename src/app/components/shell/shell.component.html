@@ -1,0 +1,134 @@
+<div class="shell" [class.shell--collapsed]="collapsed()" [class.shell--mobile-open]="mobileOpen()">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" aria-label="Navegação principal">
+    <div class="sidebar__brand" [class.sidebar__brand--icon-only]="collapsed()">
+      <img class="brand-logo" src="DATATECH.png" alt="DataTech Sistemas" />
+    </div>
+
+    <nav class="sidebar__nav">
+      <div class="nav-group">
+        <span class="nav-label">Operação</span>
+        <ul>
+          <li *ngFor="let item of operationalItems">
+            <a class="nav-item"
+               [class.nav-item--active]="activePage === item.key"
+               (click)="handleItem(item)"
+               [matTooltip]="collapsed() ? item.label : ''"
+               matTooltipPosition="right">
+              <span class="material-symbols-rounded icon-md">{{ item.icon }}</span>
+              <span class="nav-item__label">{{ item.label }}</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="nav-group" *ngIf="isAdmin()">
+        <span class="nav-label">Administração</span>
+        <ul>
+          <li *ngFor="let item of adminItems">
+            <a class="nav-item"
+               [class.nav-item--active]="activePage === item.key"
+               (click)="handleItem(item)"
+               [matTooltip]="collapsed() ? item.label : ''"
+               matTooltipPosition="right">
+              <span class="material-symbols-rounded icon-md">{{ item.icon }}</span>
+              <span class="nav-item__label">{{ item.label }}</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <button class="sidebar__collapse" (click)="toggleCollapse()" [attr.aria-label]="collapsed() ? 'Expandir menu' : 'Colapsar menu'">
+      <span class="material-symbols-rounded icon-sm">{{ collapsed() ? 'chevron_right' : 'chevron_left' }}</span>
+      <span class="sidebar__collapse-label">Colapsar</span>
+    </button>
+  </aside>
+
+  <!-- Mobile backdrop -->
+  <div class="shell__backdrop" (click)="closeMobile()"></div>
+
+  <!-- Main column -->
+  <div class="shell__main">
+
+    <!-- Topbar -->
+    <header class="topbar">
+      <button class="icon-btn topbar__menu" (click)="toggleMobile()" aria-label="Abrir menu">
+        <span class="material-symbols-rounded icon-md">menu</span>
+      </button>
+
+      <div class="topbar__title">
+        <ng-container *ngIf="breadcrumbs.length; else titleFallback">
+          <nav class="breadcrumbs" aria-label="Breadcrumb">
+            <ol>
+              <li *ngFor="let crumb of breadcrumbs; let last = last; let first = first">
+                <span class="breadcrumbs__sep" *ngIf="!first">
+                  <span class="material-symbols-rounded icon-sm">chevron_right</span>
+                </span>
+                <a *ngIf="!last && crumb.route" [routerLink]="crumb.route">{{ crumb.label }}</a>
+                <span *ngIf="last || !crumb.route" [class.breadcrumbs__current]="last">{{ crumb.label }}</span>
+              </li>
+            </ol>
+          </nav>
+        </ng-container>
+        <ng-template #titleFallback>
+          <h1 class="page-title">{{ pageTitle || 'Início' }}</h1>
+        </ng-template>
+      </div>
+
+      <div class="topbar__actions">
+        <button class="icon-btn" (click)="toggleTheme()" [attr.aria-label]="themeDark() ? 'Tema claro' : 'Tema escuro'" matTooltip="Alternar tema">
+          <span class="material-symbols-rounded icon-md">{{ themeDark() ? 'light_mode' : 'dark_mode' }}</span>
+        </button>
+
+        <button class="btn-primary-brand topbar__cta" (click)="openNewTicket()">
+          <span class="material-symbols-rounded icon-sm">add</span>
+          <span>Abrir chamado</span>
+        </button>
+
+        <div class="user-menu">
+          <button class="user-menu__trigger" (click)="toggleUserMenu()" aria-haspopup="menu" [attr.aria-expanded]="userMenuOpen()">
+            <span class="user-avatar">{{ userInitials || '?' }}</span>
+            <span class="user-menu__name">{{ usuario }}</span>
+            <span class="material-symbols-rounded icon-sm">expand_more</span>
+          </button>
+          <div class="user-menu__dropdown" *ngIf="userMenuOpen()" role="menu">
+            <div class="user-menu__header">
+              <span class="user-avatar user-avatar--lg">{{ userInitials }}</span>
+              <div>
+                <div class="user-menu__username">{{ usuario }}</div>
+                <div class="user-menu__role">{{ type === 'ADMIN' ? 'Administrador' : 'Usuário' }}</div>
+              </div>
+            </div>
+            <button class="user-menu__item" (click)="openProfile()">
+              <span class="material-symbols-rounded icon-sm">person</span> Perfil
+            </button>
+            <button class="user-menu__item user-menu__item--danger" (click)="logout()">
+              <span class="material-symbols-rounded icon-sm">logout</span> Sair
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Page content -->
+    <main class="shell__content">
+      <ng-content></ng-content>
+    </main>
+  </div>
+</div>
+
+<!-- Profile modal -->
+<div class="profile-modal" *ngIf="profileModalOpen()">
+  <div class="profile-modal__backdrop" (click)="closeProfile()"></div>
+  <div class="profile-modal__card">
+    <button class="profile-modal__close" (click)="closeProfile()" aria-label="Fechar">
+      <span class="material-symbols-rounded icon-md">close</span>
+    </button>
+    <div *ngIf="profileLoading" class="profile-modal__loading">
+      <mat-progress-spinner mode="indeterminate" color="primary" diameter="40"></mat-progress-spinner>
+    </div>
+    <app-perfil *ngIf="!profileLoading && idUser" [id]="idUser" (loadingFinished)="onProfileLoadingFinished($event)"></app-perfil>
+  </div>
+</div>

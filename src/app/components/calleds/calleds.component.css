@@ -1,0 +1,162 @@
+:host { display: block; }
+
+.calleds { display: flex; flex-direction: column; gap: 16px; }
+
+/* Toolbar */
+.calleds__toolbar {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.calleds__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-muted-fg);
+  cursor: pointer;
+  transition: background 160ms ease, color 160ms ease, border-color 160ms ease;
+}
+.chip:hover { border-color: var(--color-border-strong); color: var(--color-foreground); }
+.chip--active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+}
+.chip--active .chip__count {
+  background: rgba(255,255,255,0.18);
+  color: #fff;
+}
+
+.chip__count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 20px;
+  padding: 0 6px;
+  background: var(--color-muted);
+  color: var(--color-muted-fg);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.calleds__tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* .search styles moved to global styles.css */
+
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-foreground);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 160ms ease;
+}
+.icon-btn:hover { background: var(--color-muted); }
+
+/* Grid container */
+.calleds__grid {
+  overflow: hidden;
+  padding: 0;
+}
+
+.calleds-ag-grid {
+  width: 100%;
+  height: calc(100vh - 260px);
+  min-height: 420px;
+}
+
+/* Skeleton placeholder */
+.calleds__skeleton {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.skeleton-row {
+  display: grid;
+  grid-template-columns: 80px 1fr 1fr 200px 80px;
+  gap: 16px;
+  align-items: center;
+}
+
+.calleds__empty { padding: 32px 16px; }
+
+/* ag-grid overrides */
+:host ::ng-deep .ag-row { border-bottom: 1px solid var(--color-border); }
+:host ::ng-deep .ag-row:hover { background: var(--color-accent-soft) !important; cursor: pointer; }
+:host ::ng-deep .ag-header { border-bottom: 1px solid var(--color-border) !important; }
+:host ::ng-deep .ag-header-cell-label {
+  text-transform: uppercase;
+  font-size: 11px !important;
+  letter-spacing: 0.06em;
+}
+:host ::ng-deep .cell-id {
+  font-weight: 700;
+  color: var(--color-foreground);
+  font-variant-numeric: tabular-nums;
+}
+:host ::ng-deep .cell-reason {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--color-foreground);
+}
+:host ::ng-deep .cell-status { display: inline-flex; align-items: center; }
+
+/* ag-grid row-actions rendered via cellRenderer */
+:host ::ng-deep .row-actions {
+  display: inline-flex;
+  gap: 6px;
+}
+:host ::ng-deep .row-action {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-foreground);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+:host ::ng-deep .row-action:hover { background: var(--color-muted); border-color: var(--color-border-strong); }
+:host ::ng-deep .row-action--primary { background: var(--color-accent-soft); color: var(--color-accent); border-color: transparent; }
+:host ::ng-deep .row-action--primary:hover { background: var(--color-accent); color: #fff; }
+
+@media (max-width: 768px) {
+  .calleds-ag-grid { height: calc(100vh - 300px); min-height: 360px; }
+  .chip { padding: 6px 10px; font-size: 12px; }
+  .skeleton-row { grid-template-columns: 60px 1fr 80px; }
+  .skeleton-row > :nth-child(n+4) { display: none; }
+}

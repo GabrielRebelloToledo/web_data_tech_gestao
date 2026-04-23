@@ -1,4 +1,551 @@
-/* You can add global styles to this file, and also import other style files */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Brand */
+  --color-primary: #0F172A;
+  --color-primary-soft: #1E293B;
+  --color-primary-fg: #FFFFFF;
+
+  /* Sidebar is always dark to preserve brand identity in both themes */
+  --color-sidebar: #0F172A;
+  --color-sidebar-fg: #FFFFFF;
+  --color-sidebar-muted: rgba(255, 255, 255, 0.7);
+  --color-sidebar-label: rgba(255, 255, 255, 0.45);
+  --color-sidebar-border: rgba(255, 255, 255, 0.08);
+  --color-sidebar-hover: rgba(255, 255, 255, 0.06);
+
+  --color-accent: #0EA5E9;
+  --color-accent-hover: #0284C7;
+  --color-accent-soft: #E0F2FE;
+  --color-accent-fg: #FFFFFF;
+
+  /* Surfaces */
+  --color-background: #F8FAFC;
+  --color-surface: #FFFFFF;
+  --color-surface-2: #F1F5F9;
+  --color-foreground: #0F172A;
+  --color-muted: #F1F5F9;
+  --color-muted-fg: #64748B;
+  --color-border: #E2E8F0;
+  --color-border-strong: #CBD5E1;
+
+  /* Status */
+  --color-success: #16A34A;
+  --color-success-soft: #DCFCE7;
+  --color-warning: #D97706;
+  --color-warning-soft: #FEF3C7;
+  --color-destructive: #DC2626;
+  --color-destructive-soft: #FEE2E2;
+  --color-info: #0EA5E9;
+  --color-info-soft: #E0F2FE;
+
+  /* Effects */
+  --color-ring: #0EA5E9;
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+
+  /* Layout */
+  --sidebar-width: 260px;
+  --sidebar-width-collapsed: 72px;
+  --topbar-height: 64px;
+}
+
+[data-theme="dark"] {
+  --color-primary: #0F172A;
+  --color-primary-soft: #1E293B;
+  --color-primary-fg: #FFFFFF;
+
+  --color-accent: #38BDF8;
+  --color-accent-hover: #7DD3FC;
+  --color-accent-soft: rgba(56, 189, 248, 0.15);
+  --color-accent-fg: #0F172A;
+
+  --color-background: #0B1220;
+  --color-surface: #111827;
+  --color-surface-2: #1F2937;
+  --color-foreground: #F1F5F9;
+  --color-muted: #1F2937;
+  --color-muted-fg: #94A3B8;
+  --color-border: #1F2937;
+  --color-border-strong: #334155;
+
+  --color-success-soft: rgba(22, 163, 74, 0.15);
+  --color-warning-soft: rgba(217, 119, 6, 0.15);
+  --color-destructive-soft: rgba(220, 38, 38, 0.15);
+  --color-info-soft: rgba(56, 189, 248, 0.15);
+}
+
+* { box-sizing: border-box; }
 
 html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+body {
+  margin: 0;
+  font-family: "Plus Jakarta Sans", "Inter", "Helvetica Neue", sans-serif;
+  font-feature-settings: "cv11", "ss01", "ss03";
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Plus Jakarta Sans", "Inter", sans-serif;
+  letter-spacing: -0.02em;
+  color: var(--color-foreground);
+}
+
+a { color: var(--color-accent); text-decoration: none; }
+a:hover { color: var(--color-accent-hover); }
+
+/* Material overrides — keep brand consistent */
+.mat-mdc-raised-button.mat-primary,
+.mat-mdc-unelevated-button.mat-primary,
+.mat-mdc-flat-button.mat-primary,
+.mat-mdc-fab.mat-primary {
+  background-color: var(--color-accent) !important;
+  color: var(--color-accent-fg) !important;
+}
+
+.mat-mdc-button.mat-primary { color: var(--color-accent) !important; }
+
+.mat-mdc-progress-spinner circle { stroke: var(--color-accent) !important; }
+.mat-mdc-tab-group.mat-primary .mat-ink-bar,
+.mat-mdc-tab-nav-bar.mat-primary .mat-ink-bar {
+  background-color: var(--color-accent) !important;
+}
+
+.mat-mdc-form-field.mat-focused .mat-mdc-form-field-focus-overlay,
+.mat-mdc-form-field.mat-focused .mdc-line-ripple::after {
+  background-color: var(--color-accent) !important;
+  border-color: var(--color-accent) !important;
+}
+
+/* Snackbar variants */
+.snackbar-success { background: var(--color-success) !important; color: #fff !important; }
+.snackbar-error   { background: var(--color-destructive) !important; color: #fff !important; }
+.snackbar-info    { background: var(--color-accent) !important; color: #fff !important; }
+
+/* Material Dialog — zero internal padding so form components own their own chrome */
+.shell-dialog .mat-mdc-dialog-container,
+.shell-dialog .mdc-dialog__surface,
+.full-screen-dialog .mat-mdc-dialog-container,
+.full-screen-dialog .mdc-dialog__surface {
+  padding: 0 !important;
+  border-radius: var(--radius-lg) !important;
+  overflow: hidden !important;
+  background: var(--color-surface) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+/* Component utilities */
+.card-surface {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-xs);
+}
+
+.btn-primary-brand {
+  background: var(--color-accent);
+  color: var(--color-accent-fg);
+  border: none;
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 160ms ease, transform 160ms ease;
+}
+.btn-primary-brand:hover { background: var(--color-accent-hover); }
+.btn-primary-brand:active { transform: translateY(1px); }
+.btn-primary-brand:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-foreground);
+  border: 1px solid var(--color-border);
+  padding: 9px 16px;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 160ms ease, border-color 160ms ease;
+}
+.btn-ghost:hover { background: var(--color-muted); border-color: var(--color-border-strong); }
+
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+.status-chip--success { background: var(--color-success-soft); color: var(--color-success); }
+.status-chip--warning { background: var(--color-warning-soft); color: var(--color-warning); }
+.status-chip--danger  { background: var(--color-destructive-soft); color: var(--color-destructive); }
+.status-chip--info    { background: var(--color-info-soft); color: var(--color-info); }
+.status-chip--muted   { background: var(--color-muted); color: var(--color-muted-fg); }
+
+/* Scrollbar */
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb { background: var(--color-border-strong); border-radius: 10px; }
+*::-webkit-scrollbar-thumb:hover { background: var(--color-muted-fg); }
+
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus rings */
+:focus-visible {
+  outline: 2px solid var(--color-ring);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Icon sizing defaults */
+.material-symbols-rounded { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+.icon-sm { font-size: 18px !important; }
+.icon-md { font-size: 22px !important; }
+.icon-lg { font-size: 28px !important; }
+
+/* ===== Admin pages (shared) =============================================== */
+.admin-page { display: flex; flex-direction: column; gap: 20px; }
+
+.admin-page__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.admin-page__title {
+  margin: 0 0 4px;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--color-foreground);
+}
+
+.admin-page__subtitle {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-muted-fg);
+}
+
+.admin-table {
+  overflow-x: auto;
+  padding: 0;
+}
+
+.admin-table table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 14px;
+}
+
+.admin-table thead { background: var(--color-surface-2); }
+
+.admin-table th {
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-muted-fg);
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+}
+
+.admin-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-foreground);
+  vertical-align: middle;
+}
+
+.admin-table tr:last-child td { border-bottom: none; }
+.admin-table tr:hover td { background: var(--color-accent-soft); }
+
+.admin-table .cell-id {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-muted-fg);
+  width: 80px;
+}
+
+.admin-table__empty {
+  text-align: center;
+  color: var(--color-muted-fg);
+  padding: 32px 16px !important;
+  font-style: italic;
+}
+
+.w-col-id { width: 80px; }
+.w-col-actions { width: 140px; text-align: right; }
+
+.admin-table td:last-child { text-align: right; }
+
+.row-action {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-foreground);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 160ms ease, color 160ms ease, border-color 160ms ease;
+  margin-left: 4px;
+}
+
+.row-action:hover { background: var(--color-muted); border-color: var(--color-border-strong); }
+.row-action--primary { background: var(--color-accent-soft); color: var(--color-accent); border-color: transparent; }
+.row-action--primary:hover { background: var(--color-accent); color: #fff; }
+.row-action--danger:hover { background: var(--color-destructive-soft); color: var(--color-destructive); border-color: transparent; }
+
+.admin-toolbar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+
+/* ===== List pages (Companies / Users / etc) =========================== */
+.list-page { display: flex; flex-direction: column; gap: 16px; }
+
+.list-page__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.list-page__title {
+  margin: 0 0 4px;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--color-foreground);
+}
+.list-page__subtitle {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-muted-fg);
+}
+
+.list-page__actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.list-page__actions .search,
+.calleds__tools .search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  width: min(360px, 70vw);
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+.list-page__actions .search:focus-within,
+.calleds__tools .search:focus-within {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.12);
+}
+.list-page__actions .search .material-symbols-rounded,
+.calleds__tools .search .material-symbols-rounded { color: var(--color-muted-fg); }
+.list-page__actions .search input,
+.calleds__tools .search input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  outline: none;
+  font: inherit;
+  font-size: 14px;
+  color: var(--color-foreground);
+}
+.list-page__actions .search input::placeholder,
+.calleds__tools .search input::placeholder { color: var(--color-muted-fg); }
+
+.list-page__grid { overflow: hidden; padding: 0; }
+
+.admin-ag-grid {
+  width: 100%;
+  height: calc(100vh - 260px);
+  min-height: 420px;
+}
+
+.list-page__skeleton {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.list-page__skeleton .skeleton-row {
+  display: grid;
+  grid-template-columns: 80px 1fr 1fr 1fr 120px;
+  gap: 16px;
+  align-items: center;
+}
+.list-page__empty { padding: 32px 16px; }
+
+/* Shared ag-grid overrides for admin pages (reuses calleds styles via the same class) */
+.cell-strong { font-weight: 600; color: var(--color-foreground); }
+
+.ag-header-cell-label {
+  text-transform: uppercase;
+  font-size: 11px !important;
+  letter-spacing: 0.06em;
+}
+
+.cell-id {
+  font-weight: 700;
+  color: var(--color-foreground);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Row action buttons rendered inside ag-grid cells */
+.ag-cell .row-actions { display: inline-flex; gap: 6px; align-items: center; }
+.ag-cell .row-action {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-foreground);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 160ms ease, color 160ms ease, border-color 160ms ease;
+}
+.ag-cell .row-action:hover { background: var(--color-muted); border-color: var(--color-border-strong); }
+.ag-cell .row-action--primary { background: var(--color-accent-soft); color: var(--color-accent); border-color: transparent; }
+.ag-cell .row-action--primary:hover { background: var(--color-accent); color: #fff; }
+.ag-cell .row-action--danger:hover { background: var(--color-destructive-soft); color: var(--color-destructive); border-color: transparent; }
+
+@media (max-width: 640px) {
+  .admin-ag-grid { height: calc(100vh - 320px); min-height: 360px; }
+  .list-page__actions .search { width: 100%; }
+}
+
+/* ── Combobox overlay (rendered via CDK, needs global styles) ────────────── */
+.combobox__overlay-backdrop { background: transparent; }
+
+.combobox__panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.18), 0 4px 10px rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-height: 320px;
+  font-family: "Plus Jakarta Sans", Inter, sans-serif;
+  color: var(--color-foreground);
+}
+
+.combobox__search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface-2, var(--color-muted));
+  flex-shrink: 0;
+}
+.combobox__search-icon {
+  font-size: 18px;
+  color: var(--color-muted-fg);
+  flex-shrink: 0;
+}
+.combobox__search-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  font: inherit;
+  font-size: 14px;
+  color: var(--color-foreground);
+  padding: 2px 0;
+  min-width: 0;
+}
+.combobox__search-input::placeholder { color: var(--color-muted-fg); }
+
+.combobox__list {
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+  overflow-y: auto;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.combobox__option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--color-foreground);
+  cursor: pointer;
+  transition: background-color .1s ease, color .1s ease;
+}
+.combobox__option--active { background: var(--color-accent-soft, rgba(14, 165, 233, 0.10)); }
+.combobox__option--selected { color: var(--color-accent); font-weight: 600; }
+.combobox__option--selected.combobox__option--active { background: rgba(14, 165, 233, 0.16); }
+.combobox__option-label {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.combobox__option-check { font-size: 18px; color: var(--color-accent); flex-shrink: 0; }
+
+.combobox__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 22px 12px;
+  color: var(--color-muted-fg);
+  font-size: 13px;
+  text-align: center;
+}
+.combobox__empty .material-symbols-rounded { font-size: 28px; opacity: .6; }
+
+.combobox__list::-webkit-scrollbar { width: 8px; }
+.combobox__list::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 4px; }
+.combobox__list::-webkit-scrollbar-track { background: transparent; }
+
+[data-theme="dark"] .combobox__option--selected.combobox__option--active { background: rgba(56, 189, 248, 0.22); }

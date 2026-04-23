@@ -1,9 +1,13 @@
 {
   "routes": [
     "/",
+    "/cabreport",
     "/companies",
     "/departments",
+    "/images",
     "/inicio",
-    "/view"
+    "/relatorios",
+    "/reports",
+    "/usuarios"
   ]
 }

@@ -1,0 +1,228 @@
+<app-shell activePage="home" [breadcrumbs]="breadcrumbs()">
+
+  <!-- Loading state -->
+  <div class="detail" *ngIf="loadingCalled">
+    <div class="detail__header">
+      <app-skeleton width="260px" height="32px"></app-skeleton>
+      <app-skeleton width="160px" height="32px" [rounded]="true"></app-skeleton>
+    </div>
+    <div class="detail__grid">
+      <div class="card-surface detail__summary">
+        <app-skeleton height="20px" width="60%"></app-skeleton>
+        <app-skeleton height="16px"></app-skeleton>
+        <app-skeleton height="16px" width="80%"></app-skeleton>
+        <app-skeleton height="16px" width="50%"></app-skeleton>
+      </div>
+      <div class="card-surface detail__timeline">
+        <app-skeleton height="24px" width="180px"></app-skeleton>
+        <app-skeleton height="64px"></app-skeleton>
+        <app-skeleton height="64px"></app-skeleton>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <app-empty-state
+    *ngIf="!loadingCalled && errorMessage"
+    icon="report"
+    [title]="'Chamado não encontrado'"
+    [description]="errorMessage">
+    <button class="btn-ghost" (click)="back()">Voltar</button>
+  </app-empty-state>
+
+  <!-- Loaded -->
+  <div class="detail" *ngIf="!loadingCalled && called && !errorMessage">
+
+    <!-- Header -->
+    <header class="detail__header">
+      <div class="detail__heading">
+        <button class="icon-btn" (click)="back()" aria-label="Voltar">
+          <span class="material-symbols-rounded icon-md">arrow_back</span>
+        </button>
+        <div>
+          <div class="detail__eyebrow">Chamado</div>
+          <h1 class="detail__title">#{{ called.id }} · {{ called.reason | slice:0:48 }}{{ (called.reason?.length || 0) > 48 ? '…' : '' }}</h1>
+        </div>
+      </div>
+      <div class="detail__actions">
+        <app-status-chip [label]="called.statusId?.status || 'Sem status'"></app-status-chip>
+
+        <button class="btn-primary-brand detail__capture" *ngIf="canCapture" (click)="capture()" title="Assumir a responsabilidade deste chamado">
+          <span class="material-symbols-rounded icon-sm">bolt</span>
+          Pegar chamado
+        </button>
+
+        <span class="status-chip status-chip--success" *ngIf="isAssignedToMe()" title="Você é o responsável">
+          <span class="status-chip__dot"></span>
+          Você é o responsável
+        </span>
+      </div>
+    </header>
+
+    <div class="detail__grid">
+
+      <!-- Summary -->
+      <section class="card-surface detail__summary">
+        <h2 class="section-title">
+          <span class="material-symbols-rounded icon-md">assignment</span>
+          Detalhes
+        </h2>
+
+        <dl class="info-list">
+          <div>
+            <dt>Solicitante</dt>
+            <dd>{{ called.user?.name || '—' }}</dd>
+          </div>
+          <div>
+            <dt>E-mail</dt>
+            <dd>{{ called.user?.email || '—' }}</dd>
+          </div>
+          <div>
+            <dt>Empresa</dt>
+            <dd>{{ called.primaryCompanie?.name || '—' }}</dd>
+          </div>
+          <div>
+            <dt>Abertura</dt>
+            <dd>{{ called.dataStart | date:'dd/MM/yyyy HH:mm' }}</dd>
+          </div>
+          <div *ngIf="called.dataFinish">
+            <dt>Encerramento</dt>
+            <dd>{{ called.dataFinish | date:'dd/MM/yyyy HH:mm' }}</dd>
+          </div>
+          <div *ngIf="called.userIdResp">
+            <dt>Responsável</dt>
+            <dd>{{ called.userResp?.name || '—' }}</dd>
+          </div>
+        </dl>
+
+        <div class="reason-block">
+          <div class="reason-block__label">Motivo da abertura</div>
+          <p class="reason-block__text">{{ called.reason || '—' }}</p>
+        </div>
+
+        <div *ngIf="getAttachedFiles(called).length" class="attachments">
+          <div class="attachments__title">
+            <span class="material-symbols-rounded icon-sm">attach_file</span>
+            Anexos da abertura
+          </div>
+          <div class="attachments__list">
+            <button class="attachment-chip" *ngFor="let file of getAttachedFiles(called); let i = index" (click)="downloadFile(file)">
+              <span class="material-symbols-rounded icon-sm">description</span>
+              <span class="attachment-chip__name">Arquivo {{ i + 1 }}</span>
+              <span class="material-symbols-rounded icon-sm">download</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Timeline + new comment -->
+      <section class="detail__timeline">
+        <div class="card-surface card-surface--pad">
+          <h2 class="section-title">
+            <span class="material-symbols-rounded icon-md">forum</span>
+            Atualizações e histórico
+          </h2>
+
+          <!-- Comment form -->
+          <form class="comment-form" [formGroup]="commentForm" (ngSubmit)="submitComment()">
+            <div class="comment-form__row">
+              <label class="field">
+                <span class="field__label">Status da atualização</span>
+                <select formControlName="status" class="select">
+                  <option value="" disabled>Selecione</option>
+                  <option *ngFor="let s of statusOptions" [value]="s.id">{{ s.status }}</option>
+                </select>
+              </label>
+            </div>
+
+            <label class="field">
+              <span class="field__label">Mensagem</span>
+              <textarea formControlName="detail" rows="3" placeholder="Descreva a atualização, solução ou próximo passo…"></textarea>
+            </label>
+
+            <div class="comment-form__attachments">
+              <ng-container *ngFor="let slot of attachmentSlots">
+                <input type="file" [id]="'attach-' + slot" hidden (change)="onAttachmentSelected($event, slot)" />
+                <button type="button" class="attachment-chip attachment-chip--add"
+                        *ngIf="!commentAttachments[slot] && uploadProgress[slot] === undefined"
+                        (click)="triggerAttachment(slot)">
+                  <span class="material-symbols-rounded icon-sm">attach_file</span>
+                  Anexar
+                </button>
+
+                <div class="attachment-chip attachment-chip--uploading"
+                     *ngIf="uploadProgress[slot] !== undefined && !commentAttachments[slot]">
+                  <mat-progress-spinner mode="determinate" [value]="uploadProgress[slot]" diameter="16"></mat-progress-spinner>
+                  <span>{{ uploadProgress[slot] }}%</span>
+                </div>
+
+                <div class="attachment-chip attachment-chip--done" *ngIf="commentAttachments[slot]">
+                  <span class="material-symbols-rounded icon-sm">check_circle</span>
+                  <span class="attachment-chip__name">{{ commentAttachments[slot] }}</span>
+                  <button type="button" class="attachment-chip__remove" (click)="removeAttachment(slot)" aria-label="Remover anexo">
+                    <span class="material-symbols-rounded icon-sm">close</span>
+                  </button>
+                </div>
+              </ng-container>
+            </div>
+
+            <div class="comment-form__actions">
+              <button type="submit" class="btn-primary-brand" [disabled]="submittingComment || commentForm.invalid">
+                <span *ngIf="!submittingComment" class="btn-inline">
+                  <span class="material-symbols-rounded icon-sm">send</span>
+                  Enviar atualização
+                </span>
+                <mat-progress-spinner *ngIf="submittingComment" mode="indeterminate" diameter="18"></mat-progress-spinner>
+              </button>
+            </div>
+          </form>
+
+          <!-- Timeline -->
+          <div class="timeline" *ngIf="!loadingHistory">
+            <app-empty-state
+              *ngIf="history.length === 0"
+              icon="history"
+              title="Sem atualizações ainda"
+              description="Assim que alguém comentar ou mudar o status, aparecerá aqui.">
+            </app-empty-state>
+
+            <article class="timeline__entry" *ngFor="let entry of history">
+              <div class="timeline__bullet">
+                <span class="material-symbols-rounded icon-sm">chat</span>
+              </div>
+              <div class="timeline__card">
+                <header class="timeline__header">
+                  <div class="timeline__meta">
+                    <strong>{{ authorName(entry) }}</strong>
+                    <span class="timeline__date">{{ entry.dataResponse | date:'dd/MM/yyyy HH:mm' }}</span>
+                  </div>
+                  <app-status-chip *ngIf="statusLabel(entry)" [label]="statusLabel(entry)"></app-status-chip>
+                </header>
+                <pre class="timeline__body">{{ entry.detail }}</pre>
+                <div class="timeline__files" *ngIf="getFiles(entry).length">
+                  <button class="attachment-chip" *ngFor="let file of getFiles(entry); let i = index" (click)="downloadFile(file)">
+                    <span class="material-symbols-rounded icon-sm">description</span>
+                    <span class="attachment-chip__name">Anexo {{ i + 1 }}</span>
+                    <span class="material-symbols-rounded icon-sm">download</span>
+                  </button>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <!-- History skeleton -->
+          <div class="timeline" *ngIf="loadingHistory">
+            <div class="timeline__entry" *ngFor="let i of [0,1,2]">
+              <div class="timeline__bullet timeline__bullet--skeleton"></div>
+              <div class="timeline__card">
+                <app-skeleton width="40%" height="14px"></app-skeleton>
+                <app-skeleton height="16px"></app-skeleton>
+                <app-skeleton height="16px" width="80%"></app-skeleton>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</app-shell>

@@ -1,13 +1,10 @@
-<app-head paginaAtiva="home" ></app-head>
-<div class="graph-container">
-    <app-process *ngFor="let process of processes" 
-                 [processId]="process.processId" 
+<app-shell activePage="fluxo" pageTitle="Fluxos">
+  <div class="graph-container">
+    <app-process *ngFor="let process of processes"
+                 [processId]="process.processId"
                  [dataPast]="process.dataPast"
                  [dataEnv]="process.dataEnv"
                  [nodes]="process.nodes">
     </app-process>
   </div>
-
-
-
-  
+</app-shell>

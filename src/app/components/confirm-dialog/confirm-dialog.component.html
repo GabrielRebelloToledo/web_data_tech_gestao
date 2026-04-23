@@ -1,0 +1,7 @@
+<div class="p-4">
+    <p class="mb-4">{{ data.mensagem || 'Tem certeza?' }}</p>
+    <div class="flex justify-end space-x-1">
+        <button class="btn btn-success m-2" (click)="onConfirm()">Sim</button>
+        <button class="btn btn-danger" (click)="onCancel()">Não</button>
+    </div>
+</div>

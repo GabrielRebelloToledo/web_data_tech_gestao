@@ -1,149 +1,72 @@
-<div class="container-fluid">
+<section class="calleds">
 
-    <mat-tab-group (selectedTabChange)="onTabChange($event)">
+  <!-- Filter chips + search -->
+  <div class="calleds__toolbar">
+    <div class="calleds__chips" role="tablist">
+      <button *ngFor="let tab of visibleTabs()"
+              role="tab"
+              [attr.aria-selected]="bucket() === tab.key"
+              class="chip"
+              [class.chip--active]="bucket() === tab.key"
+              (click)="setBucket(tab.key)">
+        <span class="material-symbols-rounded icon-sm">{{ tab.icon }}</span>
+        <span>{{ tab.label }}</span>
+        <span class="chip__count" *ngIf="counts()[tab.key] !== undefined">{{ counts()[tab.key] }}</span>
+      </button>
+    </div>
 
-        <mat-tab label="Meus Chamados">
-            <table class="table table-hover table-responsible">
-                <thead>
-                    <tr>
-                        <th scope="col">Nro. Chamado</th>
-                        <th scope="col">Usuário Solicitante</th>
-                        <th scope="col">Empresa</th>
-                        <th scope="col">Motivo</th>
-                        <th scope="col">Situação</th>
-                        <th scope="col">Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let call of calledsMy">
-                        <th scope="row">{{call.id_number}}</th>
-                        <td>{{call.user_name}}</td>
-                        <td>{{call.name}}</td>
-                        <td>{{call.reason}}</td>
-                        <td>{{call.situation}}</td>
-                        <td>
-                            <i style="margin-right: 5px;">
-                                <i class="fa fa-external-link" style="cursor: pointer;" (click)="history(call.id_number)"></i>
-                            </i>
-                            <i style="margin-right: 5px;">
-                                <i class="fa fa-eye" style="cursor: pointer;" (click)="view(call.id_number)"></i>
-                            </i>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+    <div class="calleds__tools">
+      <label class="search">
+        <span class="material-symbols-rounded icon-sm">search</span>
+        <input type="search"
+               placeholder="Buscar por nº, solicitante, empresa, motivo..."
+               [ngModel]="searchTerm()"
+               (ngModelChange)="onSearchChange($event)" />
+      </label>
+      <button class="icon-btn" (click)="refresh()" aria-label="Atualizar" title="Atualizar">
+        <span class="material-symbols-rounded icon-md">refresh</span>
+      </button>
+    </div>
+  </div>
 
-        </mat-tab>
+  <!-- Loading -->
+  <div class="calleds__skeleton card-surface" *ngIf="loading()">
+    <div class="skeleton-row" *ngFor="let i of [0,1,2,3,4,5]">
+      <app-skeleton width="60px" height="18px"></app-skeleton>
+      <app-skeleton width="30%" height="18px"></app-skeleton>
+      <app-skeleton width="25%" height="18px"></app-skeleton>
+      <app-skeleton width="15%" height="18px"></app-skeleton>
+      <app-skeleton width="10%" height="18px"></app-skeleton>
+    </div>
+  </div>
 
+  <!-- Empty -->
+  <div class="card-surface calleds__empty" *ngIf="!loading() && rows().length === 0">
+    <app-empty-state
+      icon="inbox"
+      title="Nenhum chamado por aqui"
+      description="Quando houver chamados nessa categoria, eles aparecerão listados aqui.">
+    </app-empty-state>
+  </div>
 
-        <mat-tab label="Pendentes">
-
-            <table class="table table-hover table-responsible">
-                <thead>
-                    <tr>
-                        <th scope="col">Nro. Chamado</th>
-                        <th scope="col">Usuário Solicitante</th>
-                        <th scope="col">Empresa</th>
-                        <th scope="col">Motivo</th>
-                        <th scope="col">Situação</th>
-                        <th scope="col">Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let call of calledsPendents">
-                        <th scope="row">{{call.id_number}}</th>
-                        <td>{{call.user_name}}</td>
-                        <td>{{call.name}}</td>
-                        <td>{{call.reason}}</td>
-                        <td>{{call.situation}}</td>
-                        <td>
-                            <!-- <i style="margin-right: 5px;">
-                                <i class="fa fa-edit" style="cursor: pointer;" (click)="edit(call.id)"></i>
-                            </i> -->
-                            <i style="margin-right: 5px;">
-                                <i class="fa fa-eye" style="cursor: pointer;" (click)="view(call.id_number)"></i>
-                            </i>
-
-                            <i>
-                                <i class="fa fa-bolt" style="cursor: pointer;" (click)="capturar(call.id_number)"></i>
-                            </i>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-
-        </mat-tab>
-        <mat-tab label="Responsável">
-            <table class="table table-hover table-responsible">
-                <thead>
-                    <tr>
-                        <th scope="col">Nro. Chamado</th>
-                        <th scope="col">Usuário Solicitante</th>
-                        <th scope="col">Empresa</th>
-                        <th scope="col">Motivo</th>
-                        <th scope="col">Situação</th>
-                        <th scope="col">Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let call of calledsResponsable">
-                        <th scope="row">{{call.id}}</th>
-                        <td>{{call.user?.name}}</td>
-                        <td>{{call.primaryCompanie?.name}}</td>
-                        <td>{{call.reason}}</td>
-                        <td>{{call.statusId?.situation}}</td>
-                        <td>
-                            <!-- <i style="margin-right: 5px;">
-                                <i class="fa fa-edit" style="cursor: pointer;" (click)="edit(call.id)"></i>
-                            </i> -->
-                            <i style="margin-right: 5px;">
-                                <i class="fa fa-external-link" style="cursor: pointer;" (click)="history(call.id)"></i>
-                            </i>
-
-                            <!-- <i>
-                                <i class="fa fa-bolt" style="cursor: pointer;" (click)="capturar(call.id)"></i>
-                            </i> -->
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-
-        </mat-tab>
-        <mat-tab label="Todos">
-            <table class="table table-hover table-responsible">
-                <thead>
-                    <tr>
-                        <th scope="col">Nro. Chamado</th>
-                        <th scope="col">Usuário Solicitante</th>
-                        <th scope="col">Empresa</th>
-                        <th scope="col">Motivo</th>
-                        <th scope="col">Situação</th>
-                        <th scope="col">Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let call of calledsAll">
-                        <th scope="row">{{call.id}}</th>
-                        <td>{{call.user?.name}}</td>
-                        <td>{{call.primaryCompanie?.name}}</td>
-                        <td>{{call.reason}}</td>
-                        <td>{{call.statusId?.situation}}</td>
-                        <td>
-                            <!-- <i style="margin-right: 5px;">
-                                <i class="fa fa-edit" style="cursor: pointer;" (click)="edit(call.id)"></i>
-                            </i> -->
-                            <i style="margin-right: 5px;">
-                                <i class="fa fa-eye" style="cursor: pointer;" (click)="view(call.id)"></i>
-                            </i>
-
-                            <!--   <i>
-                                <i class="fa fa-bolt" style="cursor: pointer;" (click)="capturar(call.id)"></i>
-                            </i> -->
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </mat-tab>
-    </mat-tab-group>
-
-</div>
+  <!-- Grid -->
+  <div class="calleds__grid card-surface" *ngIf="!loading() && rows().length">
+    <ag-grid-angular
+      class="calleds-ag-grid"
+      [rowData]="rows()"
+      [columnDefs]="colDefs"
+      [defaultColDef]="defaultColDef"
+      [theme]="gridTheme()"
+      [localeText]="localeText"
+      [rowHeight]="56"
+      [headerHeight]="48"
+      [animateRows]="true"
+      [pagination]="true"
+      [paginationPageSize]="15"
+      [paginationPageSizeSelector]="[10, 15, 25, 50, 100]"
+      [suppressCellFocus]="true"
+      (gridReady)="onGridReady($event)"
+      (rowDoubleClicked)="onRowDoubleClicked($event)">
+    </ag-grid-angular>
+  </div>
+</section>

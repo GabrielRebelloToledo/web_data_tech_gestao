@@ -22,7 +22,6 @@ export class DepartmetsService {
 
 
   getDepartments(): Observable<any[]> {
-
     return this.http.get<any[]>(`${API}departments/list`, { headers: this.getHeaders() });
   }
 

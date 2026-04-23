@@ -1,0 +1,68 @@
+<app-drawer
+  [open]="open"
+  eyebrow="Empresas vinculadas"
+  [title]="userName || 'Usuário'"
+  subtitle="Empresas em que este usuário pode abrir chamados."
+  (close)="close()">
+
+  <div class="linkage-head">
+    <div class="linkage-head__stat">
+      <span class="material-symbols-rounded icon-sm">business</span>
+      <span>{{ linkedCompanies().length }} {{ linkedCompanies().length === 1 ? 'empresa' : 'empresas' }}</span>
+    </div>
+    <button class="btn-primary-brand btn-sm" (click)="showAdd.set(!showAdd())" *ngIf="!showAdd()">
+      <span class="material-symbols-rounded icon-sm">add</span>
+      Vincular empresa
+    </button>
+  </div>
+
+  <div class="linkage-form" *ngIf="showAdd()">
+    <label class="linkage-form__label">Selecione uma empresa</label>
+    <div class="linkage-form__row">
+      <app-combobox
+        [options]="availableCompanies()"
+        labelKey="name"
+        [value]="selectedCompanyId"
+        (valueChange)="selectedCompanyId = $event"
+        placeholder="Escolha uma empresa…"
+        searchPlaceholder="Buscar por nome ou CNPJ…"
+        [emptyMessage]="availableCompanies().length === 0 ? 'Todas as empresas já estão vinculadas' : 'Nenhuma empresa encontrada'">
+      </app-combobox>
+      <button class="btn-primary-brand btn-sm" (click)="add()" [disabled]="!selectedCompanyId">
+        <span class="material-symbols-rounded icon-sm">check</span>
+        Salvar
+      </button>
+      <button class="btn-ghost btn-sm" (click)="showAdd.set(false); selectedCompanyId = ''">Cancelar</button>
+    </div>
+  </div>
+
+  <div class="linkage-skeleton" *ngIf="loading()">
+    <app-skeleton height="56px"></app-skeleton>
+    <app-skeleton height="56px"></app-skeleton>
+    <app-skeleton height="56px"></app-skeleton>
+  </div>
+
+  <app-empty-state
+    *ngIf="!loading() && linkedCompanies().length === 0 && !showAdd()"
+    icon="domain_disabled"
+    title="Sem empresas vinculadas"
+    description="Vincule ao menos uma empresa para que este usuário possa abrir chamados.">
+  </app-empty-state>
+
+  <ul class="dept-list" *ngIf="!loading() && linkedCompanies().length">
+    <li class="dept-item dept-item--flat" *ngFor="let c of linkedCompanies()">
+      <div class="company-card">
+        <div class="company-card__icon">
+          <span class="material-symbols-rounded">business</span>
+        </div>
+        <div class="company-card__meta">
+          <strong>{{ c.name }}</strong>
+          <span *ngIf="c.cnpj">{{ c.cnpj }}</span>
+        </div>
+        <button class="row-action row-action--danger" title="Remover vínculo" (click)="remove(c)">
+          <span class="material-symbols-rounded icon-sm">close</span>
+        </button>
+      </div>
+    </li>
+  </ul>
+</app-drawer>

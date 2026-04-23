@@ -1,44 +1,166 @@
-<div class=" p-5">
-    <p><i class="fa fa-times action-icon pointer" (click)="fechar()"></i></p>
-    <form [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf="tabs.length">
-        <mat-tab-group>
-            <mat-tab *ngFor="let tab of tabs" [label]="tab.title">
-                <div class="grid grid-cols-{{ tab.columns }} gap-1">
-                    <div *ngFor="let field of tab.fields" class="p-2">
+<div class="form-dialog" *ngIf="tabs.length">
 
-                        <label class="form-label" hidden="{{field.visible}}">{{ field.placeholder }}</label>
-                        
-                        <input class="form-control"
-                            *ngIf="field.type !== 'select' && field.type !== 'check' && field.type !== 'file' &&  field.type !== 'txtarea'" 
-                            [type]="field.type" formControlName="{{ field.name }}"
-                            placeholder="{{ field.placeholder }}" hidden="{{field.visible}}">
+  <header class="form-dialog__header">
+    <div class="form-dialog__heading">
+      <div class="form-dialog__badge">
+        <span class="material-symbols-rounded">{{ header.icon }}</span>
+      </div>
+      <div>
+        <div class="form-dialog__eyebrow">{{ header.eyebrow }}</div>
+        <h2 class="form-dialog__title">{{ header.title }}</h2>
+        <p class="form-dialog__subtitle" [innerHTML]="header.subtitle"></p>
+      </div>
+    </div>
+    <button type="button" class="form-dialog__close" (click)="fechar()" aria-label="Fechar">
+      <span class="material-symbols-rounded">close</span>
+    </button>
+  </header>
 
-                        <textarea  class="form-control" *ngIf="field.type === 'txtarea'" formControlName="{{ field.name }}"></textarea>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-dialog__form">
 
-                        <div *ngIf="field.type === 'file'" class="custom-file-upload" hidden="{{field.visible}}">
-                            <i class="fa fa-upload action-icon" (click)="triggerFileInput(field.name)"></i>
-                            <input type="text" class="file-display" [id]="'file-input-2' + field.name" [value]="uploadedFiles[field.name] || 'Selecione um arquivo'" readonly (click)="onDownloadFile(field.name)"/>
-                            <!-- <i class="fa fa-download action-icon"  *ngIf="uploadedFiles[field.name]" (click)="onDownloadFile(field.name)"></i> -->
-                            <i class="fa fa-times action-icon"  *ngIf="uploadedFiles[field.name]"  (click)="onDeleteFile(field.name)"></i>
-                            <input type="file" [id]="'file-input-' + field.name" [formControlName]="field.name" (change)="onFileSelected($event, field.name)" hidden>
-                        </div>
-                        
+    <div class="form-dialog__body">
+      <section class="form-section" *ngFor="let tab of tabs; let tabIndex = index">
+        <h3 class="form-section__title" *ngIf="tabs.length > 1">{{ tab.title }}</h3>
+        <div class="form-grid">
+          <ng-container *ngFor="let field of tab.fields">
 
-                        <select *ngIf="field.type === 'select'" formControlName="{{ field.name }}" class="form-select" hidden="{{field.visible}}">
-                            <option *ngFor="let option of options[field.name]" [value]="option.id">{{ option.name || option.situation}}
-                            </option>
-                        </select>
+            <!-- Hidden fields render nothing -->
+            <ng-container *ngIf="!field.visible">
 
-                        <div class=" form-check" *ngIf="field.type == 'check'" hidden="{{field.visible}}">
-                            <input type="checkbox" class="form-check-input" formControlName="{{ field.name }}">
-                        </div>
-                    </div>
+              <!-- TEXT / NUMBER / EMAIL / PASSWORD / DATE -->
+              <label class="field"
+                     *ngIf="field.type === 'text' || field.type === 'number' || field.type === 'email' || field.type === 'password' || field.type === 'date'"
+                     [class.field--error]="form.get(field.name)?.invalid && form.get(field.name)?.touched">
+                <span class="field__label">
+                  {{ field.placeholder }}
+                  <span class="req-marker" *ngIf="field.required">*</span>
+                </span>
+                <input class="field__control"
+                       [type]="field.type"
+                       [formControlName]="field.name"
+                       [placeholder]="field.placeholder" />
+                <span class="field__helper" *ngIf="field.helper">{{ field.helper }}</span>
+                <span class="field__error"
+                      *ngIf="form.get(field.name)?.hasError('required') && form.get(field.name)?.touched">
+                  Campo obrigatório
+                </span>
+              </label>
+
+              <!-- TEXTAREA -->
+              <label class="field field--full"
+                     *ngIf="field.type === 'txtarea'"
+                     [class.field--error]="form.get(field.name)?.invalid && form.get(field.name)?.touched">
+                <span class="field__label">
+                  {{ field.placeholder }}
+                  <span class="req-marker" *ngIf="field.required">*</span>
+                </span>
+                <textarea class="field__control field__control--area"
+                          rows="4"
+                          [formControlName]="field.name"
+                          [placeholder]="field.placeholder"></textarea>
+                <span class="field__helper" *ngIf="field.helper">{{ field.helper }}</span>
+                <span class="field__error"
+                      *ngIf="form.get(field.name)?.hasError('required') && form.get(field.name)?.touched">
+                  Campo obrigatório
+                </span>
+              </label>
+
+              <!-- SELECT (via combobox) -->
+              <label class="field"
+                     *ngIf="field.type === 'select'"
+                     [class.field--error]="form.get(field.name)?.invalid && form.get(field.name)?.touched">
+                <span class="field__label">
+                  {{ field.placeholder }}
+                  <span class="req-marker" *ngIf="field.required">*</span>
+                  <button type="button" class="field__reload"
+                          *ngIf="field.optionsUrl"
+                          (click)="reloadSelect(field.name, field.optionsUrl)"
+                          [attr.aria-label]="'Recarregar ' + field.placeholder"
+                          title="Recarregar opções">
+                    <span class="material-symbols-rounded">refresh</span>
+                  </button>
+                </span>
+                <app-combobox
+                  [options]="options[field.name] || []"
+                  labelKey="__label"
+                  valueKey="id"
+                  [value]="form.get(field.name)?.value"
+                  (valueChange)="form.get(field.name)?.setValue($event); form.get(field.name)?.markAsTouched()"
+                  [placeholder]="'Selecione ' + field.placeholder.toLowerCase() + '…'"
+                  searchPlaceholder="Buscar…"
+                  emptyMessage="Nenhuma opção encontrada">
+                </app-combobox>
+                <span class="field__helper" *ngIf="field.helper">{{ field.helper }}</span>
+                <span class="field__error"
+                      *ngIf="form.get(field.name)?.hasError('required') && form.get(field.name)?.touched">
+                  Selecione uma opção
+                </span>
+              </label>
+
+              <!-- FILE -->
+              <div class="field field--full field--file"
+                   *ngIf="field.type === 'file'">
+                <span class="field__label">
+                  {{ field.placeholder }}
+                  <span class="req-marker" *ngIf="field.required">*</span>
+                </span>
+
+                <!-- Empty state: drop zone -->
+                <button type="button"
+                        class="file-drop"
+                        *ngIf="!uploadedFiles[field.name]"
+                        (click)="triggerFileInput(field.name)">
+                  <span class="material-symbols-rounded file-drop__icon">cloud_upload</span>
+                  <div class="file-drop__text">
+                    <strong>Clique para enviar</strong>
+                    <span>PDF, imagens ou documentos</span>
+                  </div>
+                </button>
+
+                <!-- Uploaded state -->
+                <div class="file-chip" *ngIf="uploadedFiles[field.name]">
+                  <span class="material-symbols-rounded file-chip__icon">description</span>
+                  <button type="button" class="file-chip__name" (click)="onDownloadFile(field.name)">
+                    {{ uploadedFiles[field.name] }}
+                  </button>
+                  <button type="button" class="file-chip__remove" (click)="onDeleteFile(field.name)"
+                          [attr.aria-label]="'Remover ' + field.placeholder">
+                    <span class="material-symbols-rounded">close</span>
+                  </button>
                 </div>
 
+                <input type="file"
+                       [id]="'file-input-' + field.name"
+                       [formControlName]="field.name"
+                       (change)="onFileSelected($event, field.name)"
+                       hidden>
+              </div>
 
-            </mat-tab>
-        </mat-tab-group>
-        <button type="submit" class="btn btn-success">Enviar</button>
-    </form>
+              <!-- CHECK -->
+              <label class="field field--check"
+                     *ngIf="field.type === 'check'">
+                <input type="checkbox" [formControlName]="field.name" />
+                <span>
+                  {{ field.placeholder }}
+                  <span class="req-marker" *ngIf="field.required">*</span>
+                </span>
+              </label>
 
+            </ng-container>
+
+          </ng-container>
+        </div>
+      </section>
+    </div>
+
+    <footer class="form-dialog__footer">
+      <button type="button" class="btn-ghost" (click)="fechar()">Cancelar</button>
+      <button type="submit" class="btn-primary-brand" [disabled]="form.invalid">
+        <span class="material-symbols-rounded">{{ submitIcon }}</span>
+        {{ submitLabel }}
+      </button>
+    </footer>
+  </form>
 </div>
+
+@if (spinner) {<app-loading [mensagemCarregamento]="mensagemCarregamento"/>}

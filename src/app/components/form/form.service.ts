@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { HttpClient, HttpEvent, HttpRequest } from '@angular/common/http';
+import { HttpClient, HttpEvent, HttpHeaders, HttpRequest } from '@angular/common/http';
 import { Observable, take } from 'rxjs';
+import { TokenService } from '../core/token/token.service';
 
 
 const API = environment.BASE_URL;
@@ -11,7 +12,15 @@ const API = environment.BASE_URL;
 
 export class FormService {
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private token: TokenService) { }
+  
+    private getHeaders(): HttpHeaders {
+      const token = this.token.getToken();
+      return new HttpHeaders({
+        Authorization: `${token}`,
+        'Content-Type': 'application/json',
+      });
+    }
 
   /**
    * Envia o arquivo para a API.
@@ -45,8 +54,13 @@ export class FormService {
   }
 
   create(updatedValues: { [key: string]: string }, url:string): Observable<any> {
-    return this.http.post(`${API}${url}`, updatedValues).pipe(take(1));
+    return this.http.post(`${API}${url}`, updatedValues, { headers: this.getHeaders() }).pipe(take(1));
   }
 
+
+
+    getSelect(url:string): Observable<any[]> {
+      return this.http.get<any[]>(`${API}${url}`, { headers: this.getHeaders() });
+    }
  
 }

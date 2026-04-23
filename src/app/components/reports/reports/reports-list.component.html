@@ -1,0 +1,196 @@
+<app-shell activePage="reports" pageTitle="Relatórios"
+           [breadcrumbs]="[{label:'Relatórios'}]">
+<div style="display:block;">
+    <a class="btn button-color m-3" (click)="novo()"> + Novo</a>
+    <input type="text" class="form-control form-control-sm mb-2" style="width: 200px;" placeholder="Buscar"
+        [(ngModel)]="buscarDados" />
+</div>
+
+
+<div class="tabela-container container mt-5">
+    <table class="table table-hover table-responsible">
+        <thead>
+            <tr>
+                <th scope="col">
+                    <span class="d-inline-flex align-items-center" style="white-space: nowrap;">
+                        Nro. Relatório
+                        <i (click)="ordenarPor('id')" class="fa ms-2 click" [ngClass]="{'fa-sort': ordenarColuna !== 'id',
+                                'fa-sort-up': ordenarColuna === 'id' && ordenarAsc,
+                                'fa-sort-down': ordenarColuna === 'id' && !ordenarAsc}"></i>
+                        <i class="fa fa-filter ms-2 icon-color-filter" style="cursor: pointer;"
+                            (click)="abrirFiltro('id')"></i>
+                    </span>
+                    <!-- Popup do filtro -->
+                    <div *ngIf="filtroAtivo === 'id'" class="filtro-popup"
+                        style="height: 300px; overflow-y: scroll; width: 300px;">
+
+                        <div class="filtro-header">
+                            <!-- Campo de busca -->
+                            <input type="text" class="form-control form-control-sm mb-2"
+                                placeholder="Buscar Nro. Chamado" [(ngModel)]="buscaTipo" />
+                            <!-- Checkbox "Marcar todos" -->
+                            <label>
+                                <input type="checkbox" [checked]="todosSelecionados('id', valoresIdReport)"
+                                    (change)="toggleTodos('id', valoresIdReport)" />
+                                Todos
+                            </label>
+                        </div>
+
+                        <!-- Área que rola -->
+                        <div class="filtro-body">
+                            <!-- Lista de opções -->
+                            <label *ngFor="let valor of valoresIdReport | filter: buscaNroRelatorio"
+                                class="d-block mb-1">
+                                <input type="checkbox" [checked]="filtrosSelecionados['id'] && filtrosSelecionados['id'].includes(valor)"
+                                    (change)="toggleFiltro('id', valor)" />
+                                {{ valor }}
+                            </label>
+                        </div>
+                        <!-- Botão fixo -->
+                        <div class="filtro-footer">
+                            <button class="btn btn-sm button-color w-100" (click)="aplicarFiltros()">Aplicar</button>
+                        </div>
+                    </div>
+
+
+
+
+                </th>
+                <th scope="col">
+                    <span class="d-inline-flex align-items-center" style="white-space: nowrap;">
+                        Nome
+                        <i (click)="ordenarPor('nome')" class="fa ms-2 click" [ngClass]="{'fa-sort': ordenarColuna !== 'nome',
+                                'fa-sort-up': ordenarColuna === 'nome' && ordenarAsc,
+                                'fa-sort-down': ordenarColuna === 'nome' && !ordenarAsc}"></i>
+                        <i class="fa fa-filter ms-2 icon-color-filter" style="cursor: pointer;"
+                            (click)="abrirFiltro('nome')"></i>
+                    </span>
+                    <!-- Popup do filtro -->
+                    <div *ngIf="filtroAtivo === 'nome'" class="filtro-popup"
+                        style="height: 300px; overflow-y: scroll; width: 300px;">
+
+                        <div class="filtro-header">
+                            <!-- Campo de busca -->
+                            <input type="text" class="form-control form-control-sm mb-2" placeholder="Buscar Motivo"
+                                [(ngModel)]="buscaNome" />
+                            <!-- Checkbox "Marcar todos" -->
+                            <label>
+                                <input type="checkbox" [checked]="todosSelecionados('nome', valoresNome)"
+                                    (change)="toggleTodos('nome', valoresNome)" />
+                                Todos
+                            </label>
+                        </div>
+
+                        <!-- Área que rola -->
+                        <div class="filtro-body">
+                            <!-- Lista de opções -->
+                            <label *ngFor="let valor of valoresNome | filter: buscaNome" class="d-block mb-1">
+                                <input type="checkbox" [checked]="filtrosSelecionados['nome'] && filtrosSelecionados['nome'].includes(valor)"
+                                    (change)="toggleFiltro('nome', valor)" />
+                                {{ valor }}
+                            </label>
+                        </div>
+                        <!-- Botão fixo -->
+                        <div class="filtro-footer">
+                            <button class="btn btn-sm button-color w-100" (click)="aplicarFiltros()">Aplicar</button>
+                        </div>
+
+                    </div>
+
+                </th>
+                <th scope="col">
+                    <span class="d-inline-flex align-items-center" style="white-space: nowrap;">
+                        Tipo
+                        <i (click)="ordenarPor('type')" class="fa ms-2 click" [ngClass]="{'fa-sort': ordenarColuna !== 'type',
+                                'fa-sort-up': ordenarColuna === 'type' && ordenarAsc,
+                                'fa-sort-down': ordenarColuna === 'type' && !ordenarAsc}"></i>
+                        <i class="fa fa-filter ms-2 icon-color-filter click" (click)="abrirFiltro('type')"></i>
+                    </span>
+
+                    <!-- Popup do filtro -->
+                    <div *ngIf="filtroAtivo === 'type'" class="filtro-popup"
+                        style="height: 300px; overflow-y: scroll; width: 300px;">
+
+                        <div class="filtro-header">
+                            <!-- Campo de busca -->
+                            <input type="text" class="form-control form-control-sm mb-2" placeholder="Buscar Situação"
+                                [(ngModel)]="buscaTipo" />
+                            <!-- Checkbox "Marcar todos" -->
+                            <label>
+                                <input type="checkbox" [checked]="todosSelecionados('type', valoresTipo)"
+                                    (change)="toggleTodos('type', valoresTipo)" />
+                                Todos
+                            </label>
+                        </div>
+
+                        <!-- Área que rola -->
+                        <div class="filtro-body">
+                            <!-- Lista de opções -->
+                            <label *ngFor="let valor of valoresTipo | filter: buscaTipo" class="d-block mb-1">
+                                <input type="checkbox" [checked]="filtrosSelecionados['type'] && filtrosSelecionados['type'].includes(valor)"
+                                    (change)="toggleFiltro('type', valor)" />
+                                {{ valor }}
+                            </label>
+                        </div>
+
+                        <div class="filtro-footer">
+                            <button class="btn btn-sm button-color w-100" (click)="aplicarFiltros()">Aplicar</button>
+                        </div>
+                    </div>
+                </th>
+
+            </tr>
+
+        </thead>
+        <tbody>
+            <tr *ngFor="let dados of datasPages | filter: buscarDados" class="click" (dblclick)="relatorio(dados.id)">
+                <th scope="row">{{dados.id}}</th>
+                <td>{{dados.nome}}</td>
+                <td>{{dados.type}}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="d-flex justify-content-end align-items-center flex-wrap gap-2 my-3">
+
+    <!-- Paginação -->
+    <nav *ngIf="listReportCab.length > itemsPerPage">
+        <ul class="pagination mb-0 click">
+
+            <li class="page-item" [class.disabled]="page === 1">
+                <a class="page-link" (click)="mudarPagina(page - 1)">Anterior</a>
+            </li>
+
+            <li class="page-item" *ngFor="let p of totalPaginasArray()" [class.active]="p === page">
+                <a class="page-link" (click)="mudarPagina(p)">{{ p }}</a>
+            </li>
+
+            <li class="page-item" [class.disabled]="page === totalPaginas()">
+                <a class="page-link" (click)="mudarPagina(page + 1)">Próxima</a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Itens por página -->
+    <!-- Itens por página -->
+    @if(listReportCab.length > 0){
+    <div class="d-flex align-items-center">
+        <label class="me-2 mb-0">Itens por página:</label>
+        <select class="form-select form-select-sm w-auto" [(ngModel)]="itemsPerPage" (change)="mudarPagina(1)">
+            <option [value]="5">5</option>
+            <option [value]="10">10</option>
+            <option [value]="20">20</option>
+            <option [value]="50">50</option>
+            <option [value]="100">100</option>
+        </select>
+    </div>
+    <ul class="pagination mb-0 ">
+        <li class="page-item" [class.disabled]="page === 1">
+            <a class="page-link">Total: {{listReportCab.length}}</a>
+        </li>
+    </ul>
+    }
+
+</div>
+</app-shell>
