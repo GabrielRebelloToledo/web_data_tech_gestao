@@ -13,6 +13,7 @@ import { ListReportsComponent } from './components/reports/list-reports/list-rep
 import { FormComponent } from './components/reports/form/form.component';
 import { ReportsComponent } from './components/reports/reports/reports.component';
 import { ImagesComponent } from './components/images/images.component';
+import { KbComponent } from './components/kb/kb.component';
 
 export const routes: Routes = [
     { path: '', component: LoginComponent, canActivate: [LoginGuard] },
@@ -29,6 +30,7 @@ export const routes: Routes = [
     { path: 'setores', component: SetoresComponent, canActivate: [AuthGuard] },
     { path: 'companies', component: CompaniesComponent, canActivate: [AuthGuard] },
     { path: 'usuarios', component: UsersComponent, canActivate: [AuthGuard] },
+    { path: 'kb-articles', component: KbComponent, canActivate: [AuthGuard] },
 
     { path: 'relatorios', component: ListReportsComponent, canActivate: [AuthGuard] },
     { path: 'reports', component: ReportsComponent, canActivate: [AuthGuard] },

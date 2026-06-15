@@ -392,6 +392,7 @@ export class CalledDetailComponent implements OnInit {
   }
 
   authorName(entry: any): string {
+    if (entry?.authorType === 'AI') return 'Assistente IA';
     return entry?.userResp?.name || entry?.user?.name || 'Sistema';
   }
 

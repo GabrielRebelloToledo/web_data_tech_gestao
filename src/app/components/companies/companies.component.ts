@@ -187,6 +187,10 @@ export class CompaniesComponent implements OnInit {
         { name: 'adress', placeholder: 'Endereço Completo', type: 'text', required: true },
         { name: 'email', placeholder: 'E-mail', type: 'email', required: true },
         { name: 'telephone', placeholder: 'Telefone', type: 'text', required: true },
+        { name: 'aiTriageEnabled', placeholder: 'Triagem por IA', type: 'select', required: false, defaultValue: 'N', options: [{ id: 'S', name: 'Sim' }, { id: 'N', name: 'Não' }], helper: 'IA responde na abertura quando acha solução na base de conhecimento.' },
+        { name: 'aiProvider', placeholder: 'Provedor de IA', type: 'select', required: false, defaultValue: 'CLAUDE', options: [{ id: 'CLAUDE', name: 'Claude' }, { id: 'OPENAI', name: 'ChatGPT (OpenAI)' }] },
+        { name: 'aiModel', placeholder: 'Modelo de IA (opcional)', type: 'text', required: false, helper: 'Vazio = modelo padrão do provedor.' },
+        { name: 'aiConfidenceThreshold', placeholder: 'Confiança mínima (%)', type: 'number', required: false, defaultValue: 75 },
       ]
     }];
 
@@ -217,7 +221,11 @@ export class CompaniesComponent implements OnInit {
         { name: 'cnpj', placeholder: 'CNPJ', type: 'text', required: true, defaultValue: company.cnpj },
         { name: 'adress', placeholder: 'Endereço Completo', type: 'text', required: true, defaultValue: company.adress },
         { name: 'email', placeholder: 'E-mail', type: 'email', required: true, defaultValue: company.email },
-        { name: 'telephone', placeholder: 'Telefone', type: 'text', required: true, defaultValue: company.telephone }
+        { name: 'telephone', placeholder: 'Telefone', type: 'text', required: true, defaultValue: company.telephone },
+        { name: 'aiTriageEnabled', placeholder: 'Triagem por IA', type: 'select', required: false, defaultValue: company.aiTriageEnabled || 'N', options: [{ id: 'S', name: 'Sim' }, { id: 'N', name: 'Não' }], helper: 'IA responde na abertura quando acha solução na base de conhecimento.' },
+        { name: 'aiProvider', placeholder: 'Provedor de IA', type: 'select', required: false, defaultValue: company.aiProvider || 'CLAUDE', options: [{ id: 'CLAUDE', name: 'Claude' }, { id: 'OPENAI', name: 'ChatGPT (OpenAI)' }] },
+        { name: 'aiModel', placeholder: 'Modelo de IA (opcional)', type: 'text', required: false, defaultValue: company.aiModel || '', helper: 'Vazio = modelo padrão do provedor.' },
+        { name: 'aiConfidenceThreshold', placeholder: 'Confiança mínima (%)', type: 'number', required: false, defaultValue: company.aiConfidenceThreshold ?? 75 }
       ]
     }];
 
