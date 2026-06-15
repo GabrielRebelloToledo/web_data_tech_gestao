@@ -144,6 +144,22 @@
             </button>
           </div>
         </div>
+
+        <!-- Galeria de prints -->
+        <div *ngIf="attachments.length" class="prints">
+          <div class="prints__title">
+            <span class="material-symbols-rounded icon-sm">image</span>
+            Prints
+          </div>
+          <div class="prints__grid">
+            <button type="button" class="print-thumb"
+                    *ngFor="let att of attachments"
+                    (click)="openPrint(att.fileName)"
+                    title="Abrir em nova aba">
+              <img [src]="apiBase + 'upload/show/' + att.fileName" alt="Print do chamado" />
+            </button>
+          </div>
+        </div>
       </section>
 
       <!-- Timeline + new comment -->

@@ -138,6 +138,39 @@
                        hidden>
               </div>
 
+              <!-- PASTE (prints colados via Ctrl+V) -->
+              <div class="field field--full field--paste"
+                   *ngIf="field.type === 'paste'">
+                <span class="field__label">
+                  {{ field.placeholder }}
+                  <span class="req-marker" *ngIf="field.required">*</span>
+                </span>
+
+                <div class="paste-drop"
+                     tabindex="0"
+                     (paste)="onPaste($event)">
+                  <span class="material-symbols-rounded paste-drop__icon">content_paste</span>
+                  <div class="paste-drop__text">
+                    <strong>Cole um print aqui (Ctrl+V)</strong>
+                    <span>Clique nesta área e pressione Ctrl+V para colar imagens.</span>
+                  </div>
+                  <span class="paste-drop__progress" *ngIf="pasteUploading > 0">
+                    Enviando {{ pasteUploading }}…
+                  </span>
+                </div>
+
+                <div class="paste-grid" *ngIf="pastedPrints.length">
+                  <figure class="paste-thumb" *ngFor="let name of pastedPrints">
+                    <img [src]="apiBase + 'upload/show/' + name" alt="Print colado" />
+                    <button type="button" class="paste-thumb__remove"
+                            (click)="removePaste(name)"
+                            aria-label="Remover print">
+                      <span class="material-symbols-rounded">close</span>
+                    </button>
+                  </figure>
+                </div>
+              </div>
+
               <!-- CHECK -->
               <label class="field field--check"
                      *ngIf="field.type === 'check'">

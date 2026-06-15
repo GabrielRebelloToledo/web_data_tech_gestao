@@ -15,7 +15,7 @@ import { ComboboxComponent } from '../shared/combobox/combobox.component';
 export interface FormFieldConfig {
   name: string;
   placeholder: string;
-  type: 'text' | 'email' | 'password' | 'select' | 'number' | 'check' | 'file' | 'date' | 'txtarea';
+  type: 'text' | 'email' | 'password' | 'select' | 'number' | 'check' | 'file' | 'date' | 'txtarea' | 'paste';
   route?: string;
   optionsUrl?: string;
   /** When true the field is hidden from the UI (legacy naming: `visible === true` means hidden). */
@@ -82,6 +82,13 @@ export class FormComponent {
 
   // Objeto para armazenar os uploads. A chave será o nome do campo.
   uploadedFiles: { [key: string]: string } = {};
+
+  /** Nomes dos arquivos de prints colados via Ctrl+V. */
+  pastedPrints: string[] = [];
+  /** Quantidade de prints sendo enviados no momento (para feedback simples). */
+  pasteUploading = 0;
+
+  get apiBase(): string { return environment.BASE_URL; }
 
   mensagemCarregamento = "";
   spinner: boolean = false;
@@ -226,7 +233,7 @@ export class FormComponent {
 
   onSubmit() {
     // Definir explicitamente o tipo de acc
-    const updatedValues = Object.keys(this.form.value).reduce<{ [key: string]: string }>((acc, key) => {
+    const updatedValues = Object.keys(this.form.value).reduce<{ [key: string]: any }>((acc, key) => {
       // Se a chave existir em uploadedFiles, substituímos pelo nome do arquivo
       if (this.uploadedFiles[key]) {
         acc[key] = this.uploadedFiles[key]; // Pega diretamente o valor de uploadedFiles
@@ -236,6 +243,9 @@ export class FormComponent {
       }
       return acc;
     }, {});
+
+    // Inclui os prints colados (sempre como array de nomes de arquivo)
+    updatedValues['prints'] = [...this.pastedPrints];
 
 
     /*  console.log(updatedValues) */
@@ -352,6 +362,51 @@ export class FormComponent {
     }
   }
 
+
+  /** Captura imagens coladas (Ctrl+V), faz upload e guarda o nome do arquivo. */
+  onPaste(event: ClipboardEvent) {
+    const items = event.clipboardData?.items;
+    if (!items) return;
+
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      if (!item.type.startsWith('image/')) continue;
+
+      const file = item.getAsFile();
+      if (!file) continue;
+
+      event.preventDefault();
+      this.pasteUploading++;
+
+      this.service.uploadFile(file).subscribe({
+        next: (e: HttpEvent<any>) => {
+          if (e.type === HttpEventType.Response) {
+            const name = e.body?.path?.filename;
+            if (name) this.pastedPrints.push(name);
+            this.pasteUploading = Math.max(0, this.pasteUploading - 1);
+          }
+        },
+        error: (error) => {
+          console.error('Erro no upload do print', error);
+          this.pasteUploading = Math.max(0, this.pasteUploading - 1);
+        }
+      });
+    }
+  }
+
+  /** Remove um print colado (exclui no servidor e tira da lista). */
+  removePaste(name: string) {
+    this.service.deleteFile(name).subscribe({
+      next: () => {
+        this.pastedPrints = this.pastedPrints.filter(n => n !== name);
+      },
+      error: (error) => {
+        console.error('Erro ao excluir o print', error);
+        // Mesmo em caso de erro, remove da UI para não travar o usuário.
+        this.pastedPrints = this.pastedPrints.filter(n => n !== name);
+      }
+    });
+  }
 
   capitalizeFirstLetter(input: string): string {
     if (input.length === 0) return input; // Caso a string esteja vazia

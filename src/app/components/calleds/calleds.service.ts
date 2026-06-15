@@ -61,6 +61,11 @@ export class CalledsService {
     return this.http.get<any[]>(`${API}called/transfer/operators/${id}`, { headers: this.getHeaders() });
   }
 
+  // Galeria de prints/anexos do chamado
+  getAttachments(id: any): Observable<any[]> {
+    return this.http.get<any[]>(`${API}called/attachments/${id}`, { headers: this.getHeaders() });
+  }
+
   // Transfere o chamado para outro operador do setor
   transferCall(id: any, toUserId: any) {
     return this.http.put<any>(`${API}called/transfer/${id}`, { toUserId }, { headers: this.getHeaders() }).pipe(take(1));

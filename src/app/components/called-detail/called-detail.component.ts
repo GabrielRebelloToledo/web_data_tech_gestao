@@ -8,6 +8,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
+import { environment } from '../../../environments/environment';
+
 import { ShellComponent } from '../shell/shell.component';
 import { EmptyStateComponent } from '../shared/empty-state/empty-state.component';
 import { StatusChipComponent } from '../shared/status-chip/status-chip.component';
@@ -42,6 +44,8 @@ export class CalledDetailComponent implements OnInit {
   id!: string | null;
   called: any = null;
   history: any[] = [];
+  attachments: any[] = [];
+  apiBase = environment.BASE_URL;
   statusOptions: StatusOption[] = [];
 
   loadingCalled = true;
@@ -88,7 +92,16 @@ export class CalledDetailComponent implements OnInit {
 
     this.loadCalled();
     this.loadHistory();
+    this.loadAttachments();
     this.loadStatuses();
+  }
+
+  loadAttachments() {
+    if (!this.id) return;
+    this.calledsService.getAttachments(this.id).subscribe({
+      next: (data: any[]) => { this.attachments = data || []; },
+      error: () => { this.attachments = []; }
+    });
   }
 
   loadCalled() {
@@ -185,6 +198,7 @@ export class CalledDetailComponent implements OnInit {
         this.submittingComment = false;
         this.snackBar.open('Chamado avaliado e concluído. Obrigado!', 'Fechar', { duration: 3000, panelClass: ['snackbar-success'] });
         this.loadHistory();
+        this.loadAttachments();
         this.loadCalled();
       },
       error: (err) => {
@@ -340,6 +354,7 @@ export class CalledDetailComponent implements OnInit {
           duration: 2500, panelClass: ['snackbar-success']
         });
         this.loadHistory();
+        this.loadAttachments();
         this.loadCalled();
       },
       error: (err) => {
@@ -364,6 +379,11 @@ export class CalledDetailComponent implements OnInit {
         window.URL.revokeObjectURL(url);
       }
     });
+  }
+
+  openPrint(fileName: string) {
+    if (!fileName) return;
+    window.open(this.apiBase + 'upload/show/' + fileName, '_blank');
   }
 
   back() {

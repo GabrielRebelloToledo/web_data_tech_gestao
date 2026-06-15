@@ -137,6 +137,7 @@ export class ShellComponent implements OnInit {
         { name: 'file2', placeholder: 'Arquivo 2', type: 'file', required: false },
         { name: 'file3', placeholder: 'Arquivo 3', type: 'file', required: false },
         { name: 'file4', placeholder: 'Arquivo 4', type: 'file', required: false },
+        { name: 'prints', placeholder: 'Prints — cole com Ctrl+V', type: 'paste', required: false },
       ]
     }];
 

@@ -53,7 +53,7 @@ export class FormService {
     }); 
   }
 
-  create(updatedValues: { [key: string]: string }, url:string): Observable<any> {
+  create(updatedValues: { [key: string]: any }, url:string): Observable<any> {
     return this.http.post(`${API}${url}`, updatedValues, { headers: this.getHeaders() }).pipe(take(1));
   }
 
