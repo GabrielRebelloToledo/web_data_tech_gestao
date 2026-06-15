@@ -1,0 +1,111 @@
+<app-shell activePage="setores" pageTitle="Setores"
+  [breadcrumbs]="[{ label: 'Setores' }]">
+
+  <div class="setores-page">
+    <!-- Header / toolbar -->
+    <div class="sp-header">
+      <div class="sp-title-wrap">
+        <h1 class="sp-title">Árvore de setores</h1>
+        <p class="sp-subtitle">Monte a hierarquia de setores da empresa e configure o SLA por nível.</p>
+      </div>
+
+      <div class="sp-toolbar">
+        <div class="sp-company">
+          <app-combobox
+            [options]="companies()"
+            labelKey="name"
+            valueKey="id"
+            [value]="selectedCompanieId()"
+            (valueChange)="onCompanyChange($event)"
+            [disabled]="loadingCompanies()"
+            placeholder="Selecione a empresa…"
+            searchPlaceholder="Buscar empresa…">
+          </app-combobox>
+        </div>
+
+        <button class="btn-ghost btn-sm" (click)="openCatalog()" [disabled]="!selectedCompanieId()">
+          <span class="material-symbols-rounded icon-sm">inventory_2</span>
+          Catálogo
+        </button>
+        <button class="btn-ghost btn-sm" (click)="loadTree()" [disabled]="!selectedCompanieId()">
+          <span class="material-symbols-rounded icon-sm">refresh</span>
+        </button>
+        <button class="btn-primary-brand btn-sm" (click)="addRoot()" [disabled]="!selectedCompanieId()">
+          <span class="material-symbols-rounded icon-sm">add</span>
+          Setor raiz
+        </button>
+      </div>
+    </div>
+
+    <!-- Estados -->
+    <ng-container *ngIf="!selectedCompanieId()">
+      <app-empty-state icon="account_tree" title="Selecione uma empresa"
+        description="Escolha uma empresa no seletor acima para ver e editar sua árvore de setores.">
+      </app-empty-state>
+    </ng-container>
+
+    <ng-container *ngIf="selectedCompanieId()">
+      <div class="sp-skeleton" *ngIf="loadingTree()">
+        <app-skeleton width="100%" height="44px" [rounded]="true"></app-skeleton>
+        <app-skeleton width="80%" height="44px" [rounded]="true"></app-skeleton>
+        <app-skeleton width="60%" height="44px" [rounded]="true"></app-skeleton>
+      </div>
+
+      <ng-container *ngIf="!loadingTree()">
+        <app-empty-state *ngIf="!tree().length" icon="account_tree" title="Árvore vazia"
+          description="Esta empresa ainda não tem setores. Clique em “Setor raiz” para começar.">
+        </app-empty-state>
+
+        <div class="sp-tree" *ngIf="tree().length">
+          <ng-container *ngTemplateOutlet="nodeTpl; context: { $implicit: tree(), depth: 0 }"></ng-container>
+        </div>
+      </ng-container>
+    </ng-container>
+  </div>
+</app-shell>
+
+<!-- Template recursivo da árvore -->
+<ng-template #nodeTpl let-nodes let-depth="depth">
+  <div class="tree-node" *ngFor="let node of nodes">
+    <div class="tn-row" [style.paddingLeft.px]="depth * 22 + 8">
+      <button class="tn-toggle" *ngIf="node.children?.length"
+        (click)="toggle(node.idDepartComp)"
+        [attr.aria-label]="isCollapsed(node.idDepartComp) ? 'Expandir' : 'Recolher'">
+        <span class="material-symbols-rounded icon-sm">
+          {{ isCollapsed(node.idDepartComp) ? 'chevron_right' : 'expand_more' }}
+        </span>
+      </button>
+      <span class="tn-toggle tn-toggle--leaf" *ngIf="!node.children?.length">
+        <span class="material-symbols-rounded icon-sm">subdirectory_arrow_right</span>
+      </span>
+
+      <span class="tn-name">{{ node.department }}</span>
+
+      <span class="tn-sla" *ngIf="slaLabel(node) as sla"
+        [class.tn-sla--inherited]="slaInherited(node)"
+        [title]="slaInherited(node) ? 'SLA herdado do nível acima' : 'SLA definido neste setor'">
+        <span class="material-symbols-rounded icon-xs">timer</span>
+        {{ sla }}
+        <span class="tn-sla__tag" *ngIf="slaInherited(node)">herdado</span>
+      </span>
+
+      <span class="tn-spacer"></span>
+
+      <div class="tn-actions">
+        <button class="row-action" title="Adicionar subsetor" (click)="addChild(node)">
+          <span class="material-symbols-rounded icon-sm">add</span>
+        </button>
+        <button class="row-action" title="Editar / SLA" (click)="editNode(node)">
+          <span class="material-symbols-rounded icon-sm">edit</span>
+        </button>
+        <button class="row-action row-action--danger" title="Excluir" (click)="deleteNode(node)">
+          <span class="material-symbols-rounded icon-sm">delete</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="tn-children" *ngIf="node.children?.length && !isCollapsed(node.idDepartComp)">
+      <ng-container *ngTemplateOutlet="nodeTpl; context: { $implicit: node.children, depth: depth + 1 }"></ng-container>
+    </div>
+  </div>
+</ng-template>

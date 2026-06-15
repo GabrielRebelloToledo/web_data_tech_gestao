@@ -51,6 +51,7 @@ export class ShellComponent implements OnInit {
   adminItems: NavItem[] = [
     { key: 'companies', label: 'Empresas', icon: 'business', route: '/companies', adminOnly: true },
     { key: 'departments', label: 'Departamentos', icon: 'apartment', route: '/departments', adminOnly: true },
+    { key: 'setores', label: 'Setores', icon: 'account_tree', route: '/setores', adminOnly: true },
     { key: 'usuarios', label: 'Usuários', icon: 'group', route: '/usuarios', adminOnly: true },
     { key: 'images', label: 'Imagens', icon: 'image', route: '/images', adminOnly: true },
   ];
