@@ -125,7 +125,7 @@ export class ShellComponent implements OnInit {
     const formConfig: TabConfig[] = [{
       title: 'Abertura de Chamado',
       fields: [
-        { name: 'userId', placeholder: 'Cód. do Usuário', type: 'number', required: true },
+        { name: 'userId', placeholder: 'Cód. do Usuário', type: 'number', required: true, readonly: true },
         { name: 'anydesk', placeholder: 'Cód. do AnyDesk', type: 'number', required: true },
         { name: 'telephone', placeholder: 'Telefone de Contato', type: 'number', required: true },
         { name: 'status', placeholder: 'Status', type: 'select', optionsUrl: `status/list`, required: true, visible: true, defaultValueName: 'Aguardando' },

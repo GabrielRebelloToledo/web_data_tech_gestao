@@ -38,6 +38,8 @@
                 <input class="field__control"
                        [type]="field.type"
                        [formControlName]="field.name"
+                       [readonly]="field.readonly"
+                       [class.field__control--readonly]="field.readonly"
                        [placeholder]="field.placeholder" />
                 <span class="field__helper" *ngIf="field.helper">{{ field.helper }}</span>
                 <span class="field__error"

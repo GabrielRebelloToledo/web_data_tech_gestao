@@ -176,6 +176,19 @@
   resize: vertical;
 }
 
+/* Read-only field: looks inert, no number spinners, not focusable-edit */
+.field__control--readonly {
+  background: var(--color-surface-muted, rgba(0,0,0,0.03));
+  cursor: not-allowed;
+  color: var(--color-muted-fg);
+}
+.field__control--readonly::-webkit-inner-spin-button,
+.field__control--readonly::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.field__control--readonly { -moz-appearance: textfield; appearance: textfield; }
+
 /* Select wrapper with custom chevron */
 .select-wrap { position: relative; }
 .select-wrap__icon {

@@ -27,6 +27,8 @@ export interface FormFieldConfig {
   defaultValueName?: string,
   /** Explicit label key for the option objects (otherwise auto-detected). */
   labelKey?: string,
+  /** Render the input as read-only (value still submits; user can't edit). */
+  readonly?: boolean,
   /** Optional helper text shown below the field. */
   helper?: string,
   /** Static options for select (alternative to optionsUrl). */
@@ -189,7 +191,11 @@ export class FormComponent {
     const raw = key ? option[key]
       : (option.name ?? option.status ?? option.department ?? option.title ?? option.label ?? '');
     const label = (raw ?? '').toString();
-    const formatted = label ? this.capitalizeFirstLetter(label) : '';
+    // Capitaliza cada segmento de caminho (ex: "TI / SANKHYA / ..." -> "Ti / Sankhya / ...")
+    // para preservar a leitura da árvore concatenada; nomes simples seguem igual.
+    const formatted = label
+      ? label.split(' / ').map((s: string) => this.capitalizeFirstLetter(s.trim())).join(' / ')
+      : '';
     return { ...option, __label: formatted };
   }
 
