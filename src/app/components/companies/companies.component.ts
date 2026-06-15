@@ -142,6 +142,15 @@ export class CompaniesComponent implements OnInit {
           editBtn.addEventListener('click', (e) => { e.stopPropagation(); this.openEditDialog(p.data); });
           div.appendChild(editBtn);
 
+          if (p.data?.aiTriageEnabled === 'S') {
+            const aiBtn = document.createElement('button');
+            aiBtn.className = 'row-action';
+            aiBtn.title = 'Testar conexão da IA';
+            aiBtn.innerHTML = `<span class="material-symbols-rounded icon-sm">smart_toy</span>`;
+            aiBtn.addEventListener('click', (e) => { e.stopPropagation(); this.testAi(p.data); });
+            div.appendChild(aiBtn);
+          }
+
           const delBtn = document.createElement('button');
           delBtn.className = 'row-action row-action--danger';
           delBtn.title = 'Excluir empresa';
@@ -191,6 +200,7 @@ export class CompaniesComponent implements OnInit {
         { name: 'aiProvider', placeholder: 'Provedor de IA', type: 'select', required: false, defaultValue: 'CLAUDE', options: [{ id: 'CLAUDE', name: 'Claude' }, { id: 'OPENAI', name: 'ChatGPT (OpenAI)' }] },
         { name: 'aiModel', placeholder: 'Modelo de IA (opcional)', type: 'text', required: false, helper: 'Vazio = modelo padrão do provedor.' },
         { name: 'aiConfidenceThreshold', placeholder: 'Confiança mínima (%)', type: 'number', required: false, defaultValue: 75 },
+        { name: 'aiApiKey', placeholder: 'Chave de API da IA (opcional)', type: 'password', required: false, helper: 'Vazio = usa a chave global do sistema.' },
       ]
     }];
 
@@ -225,7 +235,8 @@ export class CompaniesComponent implements OnInit {
         { name: 'aiTriageEnabled', placeholder: 'Triagem por IA', type: 'select', required: false, defaultValue: company.aiTriageEnabled || 'N', options: [{ id: 'S', name: 'Sim' }, { id: 'N', name: 'Não' }], helper: 'IA responde na abertura quando acha solução na base de conhecimento.' },
         { name: 'aiProvider', placeholder: 'Provedor de IA', type: 'select', required: false, defaultValue: company.aiProvider || 'CLAUDE', options: [{ id: 'CLAUDE', name: 'Claude' }, { id: 'OPENAI', name: 'ChatGPT (OpenAI)' }] },
         { name: 'aiModel', placeholder: 'Modelo de IA (opcional)', type: 'text', required: false, defaultValue: company.aiModel || '', helper: 'Vazio = modelo padrão do provedor.' },
-        { name: 'aiConfidenceThreshold', placeholder: 'Confiança mínima (%)', type: 'number', required: false, defaultValue: company.aiConfidenceThreshold ?? 75 }
+        { name: 'aiConfidenceThreshold', placeholder: 'Confiança mínima (%)', type: 'number', required: false, defaultValue: company.aiConfidenceThreshold ?? 75 },
+        { name: 'aiApiKey', placeholder: 'Chave de API da IA', type: 'password', required: false, helper: 'Vazio = mantém a chave atual / usa a global.' }
       ]
     }];
 
@@ -243,6 +254,20 @@ export class CompaniesComponent implements OnInit {
         submitIcon: 'check'
       }
     }).afterClosed().subscribe(() => this.pesquisaEmpresas());
+  }
+
+  testAi(company: any): void {
+    this.snackBar.open('Testando conexão com a IA…', '', { duration: 1500 });
+    this.serviceCompanies.testAi(company.id).subscribe({
+      next: (r: any) => {
+        if (r?.ok) {
+          this.snackBar.open('IA conectada com sucesso.', 'Fechar', { duration: 3000, panelClass: ['snackbar-success'] });
+        } else {
+          this.snackBar.open('Falha na IA: ' + (r?.error || 'erro desconhecido'), 'Fechar', { duration: 6000, panelClass: ['snackbar-error'] });
+        }
+      },
+      error: () => this.snackBar.open('Não foi possível testar a IA.', 'Fechar', { duration: 3500, panelClass: ['snackbar-error'] }),
+    });
   }
 
   deleteCompanie(id: number): void {

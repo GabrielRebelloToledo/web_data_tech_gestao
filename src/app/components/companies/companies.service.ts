@@ -31,6 +31,11 @@ export class CompaniesService {
     return this.http.delete<any[]>(`${API}companies/delete/${id}`, { headers: this.getHeaders() });
   }
 
+  // Testa a conexão/credencial da IA da empresa (Fase E).
+  testAi(id: any): Observable<any> {
+    return this.http.get<any>(`${API}companies/test-ai/${id}`, { headers: this.getHeaders() }).pipe(take(1));
+  }
+
 
   //Vinculo Empresa e Departamentos
 
