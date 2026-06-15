@@ -317,3 +317,28 @@
   transition: background 160ms ease;
 }
 .icon-btn:hover { background: var(--color-muted); }
+
+/* ── Workflow: transferência, lock e avaliação ───────────────────────── */
+.transfer-panel { margin-bottom: 16px; }
+.transfer-panel__hint { color: var(--color-muted-fg); font-size: 13px; margin: 4px 0 12px; }
+.transfer-panel__row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.transfer-panel__row .select { min-width: 240px; flex: 1; }
+.transfer-panel__empty { color: var(--color-muted-fg); font-size: 13px; margin-top: 10px; }
+
+.comment-locked {
+  display: flex; align-items: center; gap: 8px;
+  padding: 14px 16px; border-radius: var(--radius-sm);
+  background: var(--color-muted); color: var(--color-muted-fg);
+  font-size: 14px; margin-bottom: 8px;
+}
+
+.evaluate-bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  flex-wrap: wrap;
+  padding: 14px 16px; margin-bottom: 14px;
+  border: 1px solid var(--color-accent); border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+}
+.evaluate-bar__text { display: flex; flex-direction: column; gap: 2px; }
+.evaluate-bar__text strong { font-size: 14px; }
+.evaluate-bar__text span { font-size: 13px; color: var(--color-muted-fg); }

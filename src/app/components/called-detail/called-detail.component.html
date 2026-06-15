@@ -56,8 +56,39 @@
           <span class="status-chip__dot"></span>
           Você é o responsável
         </span>
+
+        <button class="btn-ghost" *ngIf="canTransfer()" (click)="toggleTransfer()" title="Transferir para outro operador do setor">
+          <span class="material-symbols-rounded icon-sm">swap_horiz</span>
+          Transferir
+        </button>
       </div>
     </header>
+
+    <!-- Painel de transferência -->
+    <div class="card-surface card-surface--pad transfer-panel" *ngIf="showTransfer">
+      <h3 class="section-title">
+        <span class="material-symbols-rounded icon-md">swap_horiz</span>
+        Transferir chamado
+      </h3>
+      <p class="transfer-panel__hint">Selecione um operador vinculado ao setor deste chamado.</p>
+      <div class="transfer-panel__row">
+        <select class="select" [(ngModel)]="transferTarget" [disabled]="loadingOperators">
+          <option value="" disabled>{{ loadingOperators ? 'Carregando…' : 'Selecione o operador' }}</option>
+          <option *ngFor="let op of transferOperators" [value]="op.id">{{ op.name }}</option>
+        </select>
+        <button class="btn-primary-brand" (click)="doTransfer()" [disabled]="!transferTarget || transferring">
+          <span *ngIf="!transferring" class="btn-inline">
+            <span class="material-symbols-rounded icon-sm">check</span>
+            Confirmar
+          </span>
+          <mat-progress-spinner *ngIf="transferring" mode="indeterminate" diameter="18"></mat-progress-spinner>
+        </button>
+        <button class="btn-ghost" (click)="toggleTransfer()">Cancelar</button>
+      </div>
+      <p class="transfer-panel__empty" *ngIf="!loadingOperators && transferOperators.length === 0">
+        Nenhum outro operador vinculado a este setor.
+      </p>
+    </div>
 
     <div class="detail__grid">
 
@@ -123,9 +154,27 @@
             Atualizações e histórico
           </h2>
 
+          <!-- Locked: chamado concluído -->
+          <div class="comment-locked" *ngIf="isLocked()">
+            <span class="material-symbols-rounded icon-sm">lock</span>
+            Chamado concluído — não é possível adicionar atualizações.
+          </div>
+
+          <!-- Avaliação do solicitante (operador finalizou) -->
+          <div class="evaluate-bar" *ngIf="canEvaluate()">
+            <div class="evaluate-bar__text">
+              <strong>Avalie o atendimento</strong>
+              <span>O operador finalizou este chamado. Aprove para concluir, ou escreva uma mensagem abaixo para reabrir.</span>
+            </div>
+            <button type="button" class="btn-primary-brand" (click)="approve()" [disabled]="submittingComment">
+              <span class="material-symbols-rounded icon-sm">task_alt</span>
+              Aprovar e concluir
+            </button>
+          </div>
+
           <!-- Comment form -->
-          <form class="comment-form" [formGroup]="commentForm" (ngSubmit)="submitComment()">
-            <div class="comment-form__row">
+          <form class="comment-form" [formGroup]="commentForm" (ngSubmit)="submitComment()" *ngIf="canComment()">
+            <div class="comment-form__row" *ngIf="canSetStatus()">
               <label class="field">
                 <span class="field__label">Status da atualização</span>
                 <select formControlName="status" class="select">
@@ -137,7 +186,7 @@
 
             <label class="field">
               <span class="field__label">Mensagem</span>
-              <textarea formControlName="detail" rows="3" placeholder="Descreva a atualização, solução ou próximo passo…"></textarea>
+              <textarea formControlName="detail" rows="3" [placeholder]="canEvaluate() ? 'Escreva aqui para reabrir o chamado…' : 'Descreva a atualização, solução ou próximo passo…'"></textarea>
             </label>
 
             <div class="comment-form__attachments">
@@ -170,7 +219,7 @@
               <button type="submit" class="btn-primary-brand" [disabled]="submittingComment || commentForm.invalid">
                 <span *ngIf="!submittingComment" class="btn-inline">
                   <span class="material-symbols-rounded icon-sm">send</span>
-                  Enviar atualização
+                  {{ canEvaluate() ? 'Reabrir e responder' : 'Enviar atualização' }}
                 </span>
                 <mat-progress-spinner *ngIf="submittingComment" mode="indeterminate" diameter="18"></mat-progress-spinner>
               </button>

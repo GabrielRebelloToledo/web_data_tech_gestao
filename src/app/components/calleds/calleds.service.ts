@@ -56,4 +56,14 @@ export class CalledsService {
     return this.http.put<any[]>(`${API}called/update/${id}`, { userId: userId }, { headers: this.getHeaders() }).pipe(take(1));
   }
 
+  // Operadores vinculados ao setor do chamado (alvos de transferência)
+  getTransferOperators(id: any): Observable<any[]> {
+    return this.http.get<any[]>(`${API}called/transfer/operators/${id}`, { headers: this.getHeaders() });
+  }
+
+  // Transfere o chamado para outro operador do setor
+  transferCall(id: any, toUserId: any) {
+    return this.http.put<any>(`${API}called/transfer/${id}`, { toUserId }, { headers: this.getHeaders() }).pipe(take(1));
+  }
+
 }

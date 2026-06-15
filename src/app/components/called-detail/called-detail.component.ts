@@ -54,6 +54,14 @@ export class CalledDetailComponent implements OnInit {
   submittingComment = false;
   canCapture = false;
   currentUserId: number;
+  currentUserType: string;
+
+  // Transferência
+  showTransfer = false;
+  loadingOperators = false;
+  transferOperators: any[] = [];
+  transferTarget: any = '';
+  transferring = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -66,6 +74,7 @@ export class CalledDetailComponent implements OnInit {
     private snackBar: MatSnackBar
   ) {
     this.currentUserId = this.userService.user?.id;
+    this.currentUserType = (this.userService.user as any)?.type || '';
   }
 
   ngOnInit(): void {
@@ -89,7 +98,8 @@ export class CalledDetailComponent implements OnInit {
       next: (result: any) => {
         this.called = result;
         // Anyone authenticated can capture an unassigned ticket
-        this.canCapture = !this.called?.userIdResp;
+        this.canCapture = !this.called?.userIdResp && !this.isLocked();
+        this.configureFormForRole();
         this.loadingCalled = false;
       },
       error: () => {
@@ -101,6 +111,124 @@ export class CalledDetailComponent implements OnInit {
 
   isAssignedToMe(): boolean {
     return !!this.called?.userIdResp && Number(this.called.userIdResp) === Number(this.currentUserId);
+  }
+
+  // ── Papéis e estado do workflow ──────────────────────────────────────
+  isAdmin(): boolean {
+    return (this.currentUserType || '').toUpperCase() === 'ADMIN';
+  }
+
+  isRequester(): boolean {
+    return !!this.called && Number(this.called.userId) === Number(this.currentUserId);
+  }
+
+  // Operador = responsável atribuído, ou ADMIN que não seja o próprio solicitante.
+  isOperator(): boolean {
+    return this.isAssignedToMe() || (this.isAdmin() && !this.isRequester());
+  }
+
+  // Chamado fechado (close = 'S') => travado, ninguém altera.
+  isLocked(): boolean {
+    const st = this.called?.statusId;
+    if (st?.close) return st.close === 'S';
+    return /conclu/i.test(st?.status || '');
+  }
+
+  isFinalizadoOperador(): boolean {
+    return /finalizado pelo operador/i.test(this.called?.statusId?.status || '');
+  }
+
+  // Quem pode postar atualização: operador (sempre, se não travado) ou
+  // solicitante (sempre, se não travado — vira "Respondido pelo Usuário").
+  canComment(): boolean {
+    return !this.isLocked() && (this.isOperator() || this.isRequester());
+  }
+
+  // Só o operador escolhe status no dropdown.
+  canSetStatus(): boolean {
+    return this.isOperator() && !this.isLocked();
+  }
+
+  // Solicitante avalia quando o operador finalizou.
+  canEvaluate(): boolean {
+    return this.isRequester() && !this.isOperator() && this.isFinalizadoOperador() && !this.isLocked();
+  }
+
+  canTransfer(): boolean {
+    return (this.isAssignedToMe() || this.isAdmin()) && !this.isLocked();
+  }
+
+  // Ajusta validação do form conforme o papel (solicitante não envia status).
+  private configureFormForRole() {
+    const statusCtrl = this.commentForm.get('status');
+    if (!statusCtrl) return;
+    if (this.canSetStatus()) {
+      statusCtrl.setValidators([Validators.required]);
+    } else {
+      statusCtrl.clearValidators();
+      statusCtrl.setValue('');
+    }
+    statusCtrl.updateValueAndValidity();
+  }
+
+  // Solicitante aprova o chamado finalizado => Concluído.
+  approve() {
+    if (!this.id || this.submittingComment) return;
+    this.submittingComment = true;
+    const payload: any = {
+      calledId: this.id,
+      action: 'approve',
+      detail: (this.commentForm.value.detail || '').trim() || 'Chamado avaliado e aprovado pelo solicitante.'
+    };
+    this.formService.create(payload, 'called/create').subscribe({
+      next: () => {
+        this.submittingComment = false;
+        this.snackBar.open('Chamado avaliado e concluído. Obrigado!', 'Fechar', { duration: 3000, panelClass: ['snackbar-success'] });
+        this.loadHistory();
+        this.loadCalled();
+      },
+      error: (err) => {
+        this.submittingComment = false;
+        const msg = err?.error?.message?.message || 'Não foi possível concluir o chamado';
+        this.snackBar.open(msg, 'Fechar', { duration: 3500, panelClass: ['snackbar-error'] });
+      }
+    });
+  }
+
+  toggleTransfer() {
+    this.showTransfer = !this.showTransfer;
+    if (this.showTransfer && !this.transferOperators.length) {
+      this.loadingOperators = true;
+      this.calledsService.getTransferOperators(this.id).subscribe({
+        next: (ops: any[]) => {
+          // Não oferecer o responsável atual como alvo.
+          this.transferOperators = (ops || []).filter(o => Number(o.id) !== Number(this.called?.userIdResp));
+          this.loadingOperators = false;
+        },
+        error: () => { this.loadingOperators = false; }
+      });
+    }
+  }
+
+  doTransfer() {
+    if (!this.id || !this.transferTarget || this.transferring) return;
+    this.transferring = true;
+    this.calledsService.transferCall(this.id, this.transferTarget).subscribe({
+      next: () => {
+        this.transferring = false;
+        this.showTransfer = false;
+        this.transferTarget = '';
+        this.transferOperators = [];
+        this.snackBar.open('Chamado transferido', 'Fechar', { duration: 2500, panelClass: ['snackbar-success'] });
+        this.loadHistory();
+        this.loadCalled();
+      },
+      error: (err) => {
+        this.transferring = false;
+        const msg = err?.error?.message?.message || 'Não foi possível transferir o chamado';
+        this.snackBar.open(msg, 'Fechar', { duration: 3500, panelClass: ['snackbar-error'] });
+      }
+    });
   }
 
   loadHistory() {
