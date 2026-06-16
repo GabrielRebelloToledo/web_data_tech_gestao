@@ -74,4 +74,39 @@ export class SetoresService {
   assignCompany(payload: { companieId: any; groupId: any; useGroupCatalog?: string }): Observable<any> {
     return this.http.put<any>(`${API}groups/assign-company`, payload, { headers: this.getHeaders() });
   }
+
+  // ── Atendentes por nó (usuários avulsos) ──────────────────────────────
+  listNodeUsers(idDepartComp: any): Observable<any[]> {
+    return this.http.get<any[]>(`${API}compdepuser/list/${idDepartComp}`, { headers: this.getHeaders() });
+  }
+
+  addNodeUser(idDepartComp: any, userId: any): Observable<any> {
+    return this.http.post<any>(`${API}compdepuser`, { idDepartComp, userId }, { headers: this.getHeaders() });
+  }
+
+  removeNodeUser(idDepCompUser: any): Observable<any> {
+    return this.http.delete<any>(`${API}compdepuser/delete/${idDepCompUser}`, { headers: this.getHeaders() });
+  }
+
+  // ── Grupos de usuários por nó ─────────────────────────────────────────
+  listNodeGroups(idDepartComp: any): Observable<any[]> {
+    return this.http.get<any[]>(`${API}usergroups/node/${idDepartComp}`, { headers: this.getHeaders() });
+  }
+
+  linkNodeGroup(idDepartComp: any, userGroupId: any): Observable<any> {
+    return this.http.post<any>(`${API}usergroups/link`, { idDepartComp, userGroupId }, { headers: this.getHeaders() });
+  }
+
+  unlinkNodeGroup(id: any): Observable<any> {
+    return this.http.delete<any>(`${API}usergroups/unlink/${id}`, { headers: this.getHeaders() });
+  }
+
+  // ── Listas para seletores ─────────────────────────────────────────────
+  getAllUsers(): Observable<any[]> {
+    return this.http.get<any[]>(`${API}sessions/list`, { headers: this.getHeaders() });
+  }
+
+  getAllUserGroups(): Observable<any[]> {
+    return this.http.get<any[]>(`${API}usergroups/list`, { headers: this.getHeaders() });
+  }
 }

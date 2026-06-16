@@ -11,6 +11,7 @@ import { SkeletonComponent } from '../shared/skeleton/skeleton.component';
 import { SetoresService } from './setores.service';
 import { SetorFormDialogComponent } from './setor-form-dialog.component';
 import { CatalogDialogComponent } from './catalog-dialog.component';
+import { AtendentesDialogComponent } from './atendentes-dialog.component';
 
 @Component({
   selector: 'app-setores',
@@ -165,5 +166,13 @@ export class SetoresComponent implements OnInit {
       data: { companieId: this.selectedCompanieId(), companieName: this.selectedCompany?.name },
     });
     ref.afterClosed().subscribe((changed) => { if (changed) this.loadTree(); });
+  }
+
+  openAtendentes(node: any) {
+    this.dialog.open(AtendentesDialogComponent, {
+      panelClass: 'shell-dialog',
+      maxWidth: '94vw',
+      data: { idDepartComp: node.idDepartComp, nodeName: node.department },
+    });
   }
 }

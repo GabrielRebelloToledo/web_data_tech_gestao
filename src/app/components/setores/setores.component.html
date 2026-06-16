@@ -1,12 +1,12 @@
-<app-shell activePage="setores" pageTitle="Setores"
-  [breadcrumbs]="[{ label: 'Setores' }]">
+<app-shell activePage="setores" pageTitle="Catálogo de chamados"
+  [breadcrumbs]="[{ label: 'Catálogo de chamados' }]">
 
   <div class="setores-page">
     <!-- Header / toolbar -->
     <div class="sp-header">
       <div class="sp-title-wrap">
-        <h1 class="sp-title">Árvore de setores</h1>
-        <p class="sp-subtitle">Monte a hierarquia de setores da empresa e configure o SLA por nível.</p>
+        <h1 class="sp-title">Catálogo de chamados</h1>
+        <p class="sp-subtitle">Monte a árvore de setores da empresa, defina SLA e atendentes por nível.</p>
       </div>
 
       <div class="sp-toolbar">
@@ -94,6 +94,9 @@
       <div class="tn-actions">
         <button class="row-action" title="Adicionar subsetor" (click)="addChild(node)">
           <span class="material-symbols-rounded icon-sm">add</span>
+        </button>
+        <button class="row-action" title="Atendentes" (click)="openAtendentes(node)">
+          <span class="material-symbols-rounded icon-sm">group</span>
         </button>
         <button class="row-action" title="Editar / SLA" (click)="editNode(node)">
           <span class="material-symbols-rounded icon-sm">edit</span>

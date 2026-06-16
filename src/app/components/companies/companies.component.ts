@@ -22,7 +22,6 @@ import { FormComponent, TabConfig } from '../form/form.component';
 import { ThemeService } from '../core/theme/theme.service';
 import { EmptyStateComponent } from '../shared/empty-state/empty-state.component';
 import { SkeletonComponent } from '../shared/skeleton/skeleton.component';
-import { CompanyLinkageDrawerComponent } from '../shared/linkage/company-linkage-drawer.component';
 import { AG_GRID_LOCALE_PT_BR } from '../calleds/calleds.locale';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -36,8 +35,7 @@ ModuleRegistry.registerModules([AllCommunityModule]);
     ShellComponent,
     AgGridAngular,
     EmptyStateComponent,
-    SkeletonComponent,
-    CompanyLinkageDrawerComponent
+    SkeletonComponent
   ],
   templateUrl: './companies.component.html',
   styleUrl: './companies.component.css'
@@ -47,9 +45,6 @@ export class CompaniesComponent implements OnInit {
   companies = signal<any[]>([]);
   loading = signal<boolean>(true);
   searchTerm = signal<string>('');
-
-  drawerOpen = signal<boolean>(false);
-  selectedCompany = signal<any>(null);
 
   private gridApi?: GridApi;
   localeText = AG_GRID_LOCALE_PT_BR;
@@ -127,13 +122,6 @@ export class CompaniesComponent implements OnInit {
           const id = p.data?.id;
           const div = document.createElement('div');
           div.className = 'row-actions';
-
-          const linkBtn = document.createElement('button');
-          linkBtn.className = 'row-action row-action--primary';
-          linkBtn.title = 'Gerenciar departamentos e atendentes';
-          linkBtn.innerHTML = `<span class="material-symbols-rounded icon-sm">account_tree</span>`;
-          linkBtn.addEventListener('click', (e) => { e.stopPropagation(); this.openLinkageDrawer(p.data); });
-          div.appendChild(linkBtn);
 
           const editBtn = document.createElement('button');
           editBtn.className = 'row-action';
@@ -287,12 +275,4 @@ export class CompaniesComponent implements OnInit {
     });
   }
 
-  openLinkageDrawer(company: any) {
-    this.selectedCompany.set(company);
-    this.drawerOpen.set(true);
-  }
-
-  closeLinkageDrawer() {
-    this.drawerOpen.set(false);
-  }
 }

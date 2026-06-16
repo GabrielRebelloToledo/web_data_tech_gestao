@@ -5,7 +5,6 @@ import { LoginComponent } from './components/login/login.component';
 import { AuthGuard } from './components/core/auth/auth.guard';
 import { HomeComponent } from './components/home/home.component';
 import { CalledDetailComponent } from './components/called-detail/called-detail.component';
-import { DepartmentsComponent } from './components/departments/departments.component';
 import { SetoresComponent } from './components/setores/setores.component';
 import { CompaniesComponent } from './components/companies/companies.component';
 import { UsersComponent } from './components/users/users.component';
@@ -27,7 +26,6 @@ export const routes: Routes = [
     { path: 'view/:id', component: CalledDetailComponent, canActivate: [AuthGuard] },
     { path: 'history/:id', component: CalledDetailComponent, canActivate: [AuthGuard] },
 
-    { path: 'departments', component: DepartmentsComponent, canActivate: [AuthGuard] },
     { path: 'setores', component: SetoresComponent, canActivate: [AuthGuard] },
     { path: 'companies', component: CompaniesComponent, canActivate: [AuthGuard] },
     { path: 'usuarios', component: UsersComponent, canActivate: [AuthGuard] },
