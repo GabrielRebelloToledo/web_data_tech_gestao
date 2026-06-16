@@ -14,6 +14,7 @@ import { FormComponent } from './components/reports/form/form.component';
 import { ReportsComponent } from './components/reports/reports/reports.component';
 import { ImagesComponent } from './components/images/images.component';
 import { KbComponent } from './components/kb/kb.component';
+import { UsergroupsComponent } from './components/usergroups/usergroups.component';
 
 export const routes: Routes = [
     { path: '', component: LoginComponent, canActivate: [LoginGuard] },
@@ -30,6 +31,7 @@ export const routes: Routes = [
     { path: 'setores', component: SetoresComponent, canActivate: [AuthGuard] },
     { path: 'companies', component: CompaniesComponent, canActivate: [AuthGuard] },
     { path: 'usuarios', component: UsersComponent, canActivate: [AuthGuard] },
+    { path: 'grupos-usuarios', component: UsergroupsComponent, canActivate: [AuthGuard] },
     { path: 'kb-articles', component: KbComponent, canActivate: [AuthGuard] },
 
     { path: 'relatorios', component: ListReportsComponent, canActivate: [AuthGuard] },
