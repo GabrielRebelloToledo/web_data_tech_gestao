@@ -51,6 +51,22 @@
       </div>
     </header>
 
+    <!-- Progresso do projeto -->
+    <section class="card-surface card-surface--pad">
+      <div class="progress-head">
+        <h2 class="section-title">
+          <span class="material-symbols-rounded icon-md">trending_up</span>
+          Progresso do projeto
+        </h2>
+        <span class="progress-head__value">{{ clampProgress(project.progress) }}%</span>
+      </div>
+      <div class="progress">
+        <div class="progress__track">
+          <div class="progress__bar" [style.width.%]="clampProgress(project.progress)"></div>
+        </div>
+      </div>
+    </section>
+
     <!-- Descrição -->
     <section class="card-surface card-surface--pad" *ngIf="project.description">
       <h2 class="section-title">
@@ -60,63 +76,36 @@
       <p class="reason-block__text">{{ project.description }}</p>
     </section>
 
-    <!-- Chamados vinculados -->
+    <!-- Chamados vinculados (resumo read-only) -->
     <section class="card-surface card-surface--pad">
       <div class="section-head">
         <h2 class="section-title">
           <span class="material-symbols-rounded icon-md">support_agent</span>
           Chamados vinculados
         </h2>
-        <button class="btn-ghost" (click)="toggleLink()">
-          <span class="material-symbols-rounded icon-sm">{{ showLink ? 'close' : 'add_link' }}</span>
-          {{ showLink ? 'Cancelar' : 'Vincular chamado' }}
-        </button>
       </div>
 
-      <!-- Picker -->
-      <div class="link-panel" *ngIf="showLink">
-        <app-combobox
-          class="link-panel__combo"
-          [options]="linkOptions"
-          [value]="linkTarget"
-          [placeholder]="loadingCalleds ? 'Carregando…' : 'Selecione um chamado'"
-          searchPlaceholder="Buscar chamado…"
-          emptyMessage="Nenhum chamado disponível"
-          (valueChange)="linkTarget = $event">
-        </app-combobox>
-        <button class="btn-primary-brand" (click)="linkCalled()" [disabled]="linkTarget == null || linking">
-          <span class="material-symbols-rounded icon-sm">check</span>
-          Vincular
-        </button>
-      </div>
+      <p class="hint-text" *ngIf="calledsResumo.length === 0">
+        Os chamados são vinculados nas tarefas do cronograma abaixo.
+      </p>
 
-      <app-empty-state
-        *ngIf="calleds.length === 0"
-        icon="link_off"
-        title="Nenhum chamado vinculado"
-        description="Use o botão Vincular chamado para associar chamados a este projeto.">
-      </app-empty-state>
-
-      <ul class="link-list" *ngIf="calleds.length">
-        <li class="link-item" *ngFor="let link of calleds">
+      <ul class="link-list" *ngIf="calledsResumo.length">
+        <li class="link-item" *ngFor="let call of calledsResumo">
           <div class="link-item__main">
-            <strong class="link-item__title">#{{ link.call?.id }} · {{ link.call?.reason || 'Sem motivo' }}</strong>
+            <strong class="link-item__title">#{{ call.id }} · {{ call.reason || 'Sem motivo' }}</strong>
             <div class="link-item__meta">
               <span class="link-item__chip">
                 <span class="material-symbols-rounded icon-sm">business</span>
-                {{ link.call?.primaryCompanie?.name || '—' }}
+                {{ call.primaryCompanie?.name || '—' }}
               </span>
               <span class="link-item__chip">
                 <span class="material-symbols-rounded icon-sm">person</span>
-                {{ link.call?.user?.name || '—' }}
+                {{ call.user?.name || '—' }}
               </span>
             </div>
           </div>
           <div class="link-item__side">
-            <app-status-chip [label]="link.call?.statusId?.status || 'Sem status'"></app-status-chip>
-            <button class="row-action row-action--danger" title="Remover vínculo" (click)="removeCalled(link.id)">
-              <span class="material-symbols-rounded icon-sm">delete</span>
-            </button>
+            <app-status-chip [label]="call.statusId?.status || 'Sem status'"></app-status-chip>
           </div>
         </li>
       </ul>
@@ -176,6 +165,70 @@
               <div class="progress__bar" [style.width.%]="clampProgress(task.progress)"></div>
             </div>
             <span class="progress__value">{{ clampProgress(task.progress) }}%</span>
+          </div>
+
+          <div class="task-item__auto" *ngIf="task.auto">
+            <span class="material-symbols-rounded icon-sm">bolt</span>
+            Automático · {{ task.doneCount }}/{{ task.totalCount }} concluídos
+          </div>
+
+          <!-- Chamados da tarefa -->
+          <div class="task-calleds">
+            <div class="task-calleds__head">
+              <span class="task-calleds__label">
+                <span class="material-symbols-rounded icon-sm">support_agent</span>
+                Chamados da tarefa
+              </span>
+              <button class="btn-ghost btn-ghost--sm" (click)="toggleTaskLink(task)">
+                <span class="material-symbols-rounded icon-sm">{{ linkTaskId === task.id ? 'close' : 'add_link' }}</span>
+                {{ linkTaskId === task.id ? 'Cancelar' : 'Vincular chamado' }}
+              </button>
+            </div>
+
+            <!-- Picker -->
+            <div class="link-panel" *ngIf="linkTaskId === task.id">
+              <app-combobox
+                class="link-panel__combo"
+                [options]="linkOptions"
+                [value]="linkTarget"
+                [placeholder]="loadingCalleds ? 'Carregando…' : 'Selecione um chamado'"
+                searchPlaceholder="Buscar chamado…"
+                emptyMessage="Nenhum chamado disponível"
+                (valueChange)="linkTarget = $event">
+              </app-combobox>
+              <button class="btn-primary-brand" (click)="addTaskCalled(task.id)" [disabled]="linkTarget == null || linking">
+                <span class="material-symbols-rounded icon-sm">check</span>
+                Vincular
+              </button>
+            </div>
+
+            <p class="hint-text" *ngIf="!(task.calleds?.length)">
+              Nenhum chamado vinculado a esta tarefa.
+            </p>
+
+            <ul class="link-list" *ngIf="task.calleds?.length">
+              <li class="link-item link-item--compact" *ngFor="let link of task.calleds">
+                <div class="link-item__main">
+                  <strong class="link-item__title">#{{ link.call?.id }} · {{ link.call?.reason || 'Sem motivo' }}</strong>
+                  <div class="link-item__meta">
+                    <span class="link-item__chip">
+                      <span class="material-symbols-rounded icon-sm">business</span>
+                      {{ link.call?.primaryCompanie?.name || '—' }}
+                    </span>
+                    <span class="link-item__chip">
+                      <span class="material-symbols-rounded icon-sm">person</span>
+                      {{ link.call?.user?.name || '—' }}
+                    </span>
+                  </div>
+                </div>
+                <div class="link-item__side">
+                  <app-status-chip [label]="link.call?.statusId?.status || 'Sem status'"></app-status-chip>
+                  <button class="row-action row-action--danger" title="Remover vínculo" (click)="removeTaskCalled(link.id)">
+                    <span class="material-symbols-rounded icon-sm">delete</span>
+                  </button>
+                </div>
+              </li>
+            </ul>
           </div>
         </li>
       </ul>

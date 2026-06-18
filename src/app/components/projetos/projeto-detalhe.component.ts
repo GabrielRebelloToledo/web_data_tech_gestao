@@ -47,8 +47,8 @@ export class ProjetoDetalheComponent implements OnInit {
   loading = true;
   errorMessage = '';
 
-  // Vincular chamado
-  showLink = false;
+  // Vincular chamado (por tarefa)
+  linkTaskId: number | null = null;
   loadingCalleds = false;
   availableCalleds: any[] = [];
   linkOptions: { id: number; name: string }[] = [];
@@ -119,8 +119,8 @@ export class ProjetoDetalheComponent implements OnInit {
     return Math.max(0, Math.min(100, n));
   }
 
-  get calleds(): any[] {
-    return this.project?.calleds || [];
+  get calledsResumo(): any[] {
+    return this.project?.calledsResumo || [];
   }
 
   get tasks(): any[] {
@@ -129,11 +129,16 @@ export class ProjetoDetalheComponent implements OnInit {
     );
   }
 
-  // ── Chamados vinculados ──────────────────────────────────────────────
-  toggleLink() {
-    this.showLink = !this.showLink;
+  // ── Chamados por tarefa ──────────────────────────────────────────────
+  toggleTaskLink(task: any) {
+    if (this.linkTaskId === task.id) {
+      this.linkTaskId = null;
+      this.linkTarget = null;
+      return;
+    }
+    this.linkTaskId = task.id;
     this.linkTarget = null;
-    if (this.showLink && !this.availableCalleds.length) {
+    if (!this.availableCalleds.length) {
       this.loadingCalleds = true;
       this.projetosService.listCalleds().subscribe({
         next: (data: any[]) => {
@@ -149,18 +154,18 @@ export class ProjetoDetalheComponent implements OnInit {
     }
   }
 
-  linkCalled() {
-    if (!this.id || this.linkTarget == null || this.linking) return;
+  addTaskCalled(taskId: number) {
+    if (this.linkTarget == null || this.linking) return;
     this.linking = true;
-    this.projetosService.addCalled(this.id, this.linkTarget).subscribe({
+    this.projetosService.addTaskCalled(taskId, this.linkTarget).subscribe({
       next: () => {
         this.linking = false;
-        this.showLink = false;
+        this.linkTaskId = null;
         this.linkTarget = null;
         this.snackBar.open('Chamado vinculado', 'Fechar', { duration: 2500, panelClass: ['snackbar-success'] });
         this.loadProject();
       },
-      error: (err) => {
+      error: (err: any) => {
         this.linking = false;
         const msg = err?.error?.message?.message || 'Não foi possível vincular o chamado';
         this.snackBar.open(msg, 'Fechar', { duration: 3500, panelClass: ['snackbar-error'] });
@@ -168,9 +173,9 @@ export class ProjetoDetalheComponent implements OnInit {
     });
   }
 
-  removeCalled(projectCalledId: number) {
-    if (!confirm('Remover este chamado do projeto?')) return;
-    this.projetosService.removeCalled(projectCalledId).subscribe({
+  removeTaskCalled(linkId: number) {
+    if (!confirm('Remover este chamado da tarefa?')) return;
+    this.projetosService.removeTaskCalled(linkId).subscribe({
       next: () => {
         this.snackBar.open('Vínculo removido', 'Fechar', { duration: 2500, panelClass: ['snackbar-success'] });
         this.loadProject();
@@ -216,19 +221,26 @@ export class ProjetoDetalheComponent implements OnInit {
   }
 
   openEditTask(task: any) {
+    const isAuto = !!task.auto || (task.calleds?.length || 0) > 0;
+    const fields: any[] = [
+      { name: 'id', placeholder: 'Cód.', type: 'number', required: true, visible: true, defaultValue: task.id },
+      { name: 'title', placeholder: 'Título', type: 'text', required: true, defaultValue: task.title },
+      { name: 'description', placeholder: 'Descrição', type: 'txtarea', required: false, defaultValue: task.description },
+      { name: 'responsibleUserId', placeholder: 'Responsável', type: 'select', required: false, optionsUrl: 'sessions/list', labelKey: 'name', defaultValue: task.responsibleUserId },
+      { name: 'startDate', placeholder: 'Início', type: 'date', required: false, defaultValue: this.toInputDate(task.startDate) },
+      { name: 'dueDate', placeholder: 'Prazo', type: 'date', required: false, defaultValue: this.toInputDate(task.dueDate) }
+    ];
+    if (!isAuto) {
+      fields.push(
+        { name: 'status', placeholder: 'Status', type: 'select', required: true, defaultValue: task.status || 'PENDENTE', options: TASK_STATUS_OPTIONS },
+        { name: 'progress', placeholder: 'Progresso (%)', type: 'number', required: false, defaultValue: task.progress ?? 0 }
+      );
+    }
+    fields.push({ name: 'orderIndex', placeholder: 'Ordem', type: 'number', required: false, defaultValue: task.orderIndex ?? 0 });
+
     const formConfig: TabConfig[] = [{
       title: 'Editar Tarefa',
-      fields: [
-        { name: 'id', placeholder: 'Cód.', type: 'number', required: true, visible: true, defaultValue: task.id },
-        { name: 'title', placeholder: 'Título', type: 'text', required: true, defaultValue: task.title },
-        { name: 'description', placeholder: 'Descrição', type: 'txtarea', required: false, defaultValue: task.description },
-        { name: 'responsibleUserId', placeholder: 'Responsável', type: 'select', required: false, optionsUrl: 'sessions/list', labelKey: 'name', defaultValue: task.responsibleUserId },
-        { name: 'startDate', placeholder: 'Início', type: 'date', required: false, defaultValue: this.toInputDate(task.startDate) },
-        { name: 'dueDate', placeholder: 'Prazo', type: 'date', required: false, defaultValue: this.toInputDate(task.dueDate) },
-        { name: 'status', placeholder: 'Status', type: 'select', required: true, defaultValue: task.status || 'PENDENTE', options: TASK_STATUS_OPTIONS },
-        { name: 'progress', placeholder: 'Progresso (%)', type: 'number', required: false, defaultValue: task.progress ?? 0 },
-        { name: 'orderIndex', placeholder: 'Ordem', type: 'number', required: false, defaultValue: task.orderIndex ?? 0 }
-      ]
+      fields
     }];
 
     this.dialog.open(FormComponent, {

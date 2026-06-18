@@ -37,12 +37,12 @@ export class ProjetosService {
     return this.http.get<any[]>(`${API}projects/calleds`, { headers: this.getHeaders() });
   }
 
-  addCalled(projectId: string | number, calledId: string | number): Observable<any> {
-    return this.http.post<any>(`${API}projects/${projectId}/called`, { calledId }, { headers: this.getHeaders() });
+  addTaskCalled(taskId: string | number, calledId: string | number): Observable<any> {
+    return this.http.post<any>(`${API}projects/task/${taskId}/called`, { calledId }, { headers: this.getHeaders() });
   }
 
-  removeCalled(projectCalledId: string | number): Observable<any> {
-    return this.http.delete<any>(`${API}projects/called/${projectCalledId}`, { headers: this.getHeaders() });
+  removeTaskCalled(linkId: string | number): Observable<any> {
+    return this.http.delete<any>(`${API}projects/task-called/${linkId}`, { headers: this.getHeaders() });
   }
 
   deleteTask(taskId: string | number): Observable<any> {

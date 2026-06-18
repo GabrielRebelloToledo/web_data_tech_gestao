@@ -70,6 +70,27 @@
 }
 .section-title .material-symbols-rounded { color: var(--color-accent); }
 
+.hint-text {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-muted-fg);
+}
+
+/* Progresso do projeto (header) */
+.progress-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.progress-head__value {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--color-foreground);
+}
+
 .reason-block__text {
   margin: 0;
   font-size: 14px;
@@ -213,6 +234,51 @@
   min-width: 38px;
   text-align: right;
 }
+
+/* Rótulo automático da tarefa */
+.task-item__auto {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  align-self: flex-start;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-muted-fg);
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--color-muted);
+  border: 1px solid var(--color-border);
+}
+.task-item__auto .material-symbols-rounded { color: var(--color-accent); }
+
+/* Sub-bloco: chamados da tarefa */
+.task-calleds {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--color-border);
+}
+.task-calleds__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.task-calleds__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-foreground);
+}
+.task-calleds__label .material-symbols-rounded { color: var(--color-accent); }
+
+.btn-ghost--sm { font-size: 12px; padding: 6px 10px; }
+
+.link-item--compact { padding: 12px 14px; }
 
 /* Row actions (botões compactos) */
 .row-action {
