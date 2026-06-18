@@ -61,6 +61,11 @@
           <span class="material-symbols-rounded icon-sm">swap_horiz</span>
           Transferir
         </button>
+
+        <button class="btn-ghost btn-ghost--danger" *ngIf="canCancel()" (click)="cancelCalled()" title="Cancelar o chamado">
+          <span class="material-symbols-rounded icon-sm">cancel</span>
+          Cancelar chamado
+        </button>
       </div>
     </header>
 

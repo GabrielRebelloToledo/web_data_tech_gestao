@@ -71,4 +71,9 @@ export class CalledsService {
     return this.http.put<any>(`${API}called/transfer/${id}`, { toUserId }, { headers: this.getHeaders() }).pipe(take(1));
   }
 
+  // Cancela o chamado (solicitante ou ADMIN)
+  cancelCall(id: any) {
+    return this.http.put<any>(`${API}called/cancel/${id}`, {}, { headers: this.getHeaders() }).pipe(take(1));
+  }
+
 }

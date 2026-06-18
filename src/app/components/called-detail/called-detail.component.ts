@@ -302,6 +302,27 @@ export class CalledDetailComponent implements OnInit {
     return (this.isAssignedToMe() || this.isAdmin()) && !this.isLocked();
   }
 
+  // Cancelar: solicitante (quem abriu) ou ADMIN, enquanto não encerrado.
+  canCancel(): boolean {
+    return (this.isRequester() || this.isAdmin()) && !this.isLocked();
+  }
+
+  cancelCalled() {
+    if (!this.id || !this.canCancel()) return;
+    if (!confirm('Cancelar este chamado? Isso encerra o chamado.')) return;
+    this.calledsService.cancelCall(this.id).subscribe({
+      next: () => {
+        this.snackBar.open('Chamado cancelado', 'Fechar', { duration: 2500, panelClass: ['snackbar-success'] });
+        this.loadHistory();
+        this.loadCalled();
+      },
+      error: (err) => {
+        const msg = err?.error?.message?.message || 'Não foi possível cancelar o chamado';
+        this.snackBar.open(msg, 'Fechar', { duration: 3500, panelClass: ['snackbar-error'] });
+      }
+    });
+  }
+
   // Ajusta validação do form conforme o papel (solicitante não envia status).
   private configureFormForRole() {
     const statusCtrl = this.commentForm.get('status');

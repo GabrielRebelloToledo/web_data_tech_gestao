@@ -260,7 +260,12 @@ export class FormComponent {
         this.spinner = false;
         this.dialog.closeAll();
         if (!this.data?.skipReload) {
-          window.location.reload();
+          // Reload da rota client-side (sem window.location.reload, que dispara
+          // o SSR sem token e faz piscar a tela de login). Recarrega os dados
+          // da página atual recriando o componente da rota.
+          const url = this.router.url;
+          this.router.navigateByUrl('/inicio', { skipLocationChange: true })
+            .then(() => this.router.navigateByUrl(url));
         }
       },
       error: (err) => {
