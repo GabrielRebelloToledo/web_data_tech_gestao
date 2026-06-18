@@ -11,6 +11,8 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 
 import { LocationStrategy, HashLocationStrategy } from '@angular/common';
 
+import { provideNgxMask } from 'ngx-mask';
+
 import { requestInterceptorFn } from '../app/components/core/auth/request.interceptor';
 import { PermissionsService } from '../app/components/core/permissions/permissions.service';
 
@@ -32,8 +34,7 @@ export const appConfig: ApplicationConfig = {
     provideAnimationsAsync(),
     provideClientHydration(),
     provideHttpClient(withFetch(), withInterceptors([requestInterceptorFn])),
-    provideAnimationsAsync(),
-    provideAnimationsAsync(),
+    provideNgxMask(),
     {
       provide: APP_INITIALIZER,
       useFactory: initPermissions,

@@ -148,7 +148,7 @@ export class ShellComponent implements OnInit {
       fields: [
         { name: 'userId', placeholder: 'Cód. do Usuário', type: 'number', required: true, readonly: true },
         { name: 'anydesk', placeholder: 'Cód. do AnyDesk', type: 'number', required: true },
-        { name: 'telephone', placeholder: 'Telefone de Contato', type: 'number', required: true },
+        { name: 'telephone', placeholder: 'Telefone de Contato', type: 'text', required: true, mask: '(00) 0000-0000||(00) 00000-0000' },
         { name: 'status', placeholder: 'Status', type: 'select', optionsUrl: `status/list`, required: true, visible: true, defaultValueName: 'Aguardando' },
         { name: 'companieIdP', placeholder: 'Empresa Abertura', type: 'select', optionsUrl: `usercompanies/show/${id}`, required: true },
         { name: 'idDepCall', placeholder: 'Chamado para', type: 'select', optionsUrl: `compdepuser/listdepcall/${id}`, required: true },

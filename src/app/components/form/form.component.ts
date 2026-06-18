@@ -10,6 +10,7 @@ import { FormService } from './form.service';
 import { UserService } from '../core/user/user.service';
 import { LoadingComponent } from "../loading/loading/loading.component";
 import { ComboboxComponent } from '../shared/combobox/combobox.component';
+import { NgxMaskDirective } from 'ngx-mask';
 
 
 export interface FormFieldConfig {
@@ -29,6 +30,8 @@ export interface FormFieldConfig {
   labelKey?: string,
   /** Render the input as read-only (value still submits; user can't edit). */
   readonly?: boolean,
+  /** ngx-mask pattern (ex: '00.000.000/0000-00', '(00) 0000-0000||(00) 00000-0000'). */
+  mask?: string,
   /** Optional helper text shown below the field. */
   helper?: string,
   /** Static options for select (alternative to optionsUrl). */
@@ -73,7 +76,7 @@ const API = environment.BASE_URL;
 @Component({
   selector: 'app-form',
   standalone: true,
-  imports: [FormsModule, CommonModule, ReactiveFormsModule, MatTabsModule, LoadingComponent, ComboboxComponent],
+  imports: [FormsModule, CommonModule, ReactiveFormsModule, MatTabsModule, LoadingComponent, ComboboxComponent, NgxMaskDirective],
   templateUrl: './form.component.html',
   styleUrl: './form.component.css'
 })

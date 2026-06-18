@@ -40,6 +40,9 @@
                        [formControlName]="field.name"
                        [readonly]="field.readonly"
                        [class.field__control--readonly]="field.readonly"
+                       [mask]="field.mask || ''"
+                       [dropSpecialCharacters]="false"
+                       [validation]="false"
                        [placeholder]="field.placeholder" />
                 <span class="field__helper" *ngIf="field.helper">{{ field.helper }}</span>
                 <span class="field__error"
