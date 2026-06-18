@@ -169,7 +169,9 @@ export class CalledDetailComponent implements OnInit {
       data: {
         tabs: formConfig,
         url: 'billing/apontamentos',
-        callId: '',
+        // calledId: o FormComponent faz patchValue({calledId: this.callId}) no init,
+        // então passamos o id do chamado aqui (senão zera o campo obrigatório).
+        callId: this.id,
         skipReload: true,
         header: { icon: 'schedule', eyebrow: 'Apontamento', title: 'Lançar horas', subtitle: 'Registre as horas trabalhadas neste chamado.' },
         submitLabel: 'Lançar horas',
