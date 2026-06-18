@@ -1,0 +1,185 @@
+<app-shell activePage="projetos" [breadcrumbs]="breadcrumbs()">
+
+  <!-- Loading -->
+  <div class="detail" *ngIf="loading">
+    <div class="detail__header">
+      <app-skeleton width="260px" height="32px"></app-skeleton>
+      <app-skeleton width="160px" height="32px" [rounded]="true"></app-skeleton>
+    </div>
+    <div class="card-surface card-surface--pad">
+      <app-skeleton height="24px" width="180px"></app-skeleton>
+      <app-skeleton height="64px"></app-skeleton>
+      <app-skeleton height="64px"></app-skeleton>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <app-empty-state
+    *ngIf="!loading && errorMessage"
+    icon="report"
+    [title]="'Projeto não encontrado'"
+    [description]="errorMessage">
+    <button class="btn-ghost" (click)="back()">Voltar</button>
+  </app-empty-state>
+
+  <!-- Loaded -->
+  <div class="detail" *ngIf="!loading && project && !errorMessage">
+
+    <!-- Header -->
+    <header class="detail__header">
+      <div class="detail__heading">
+        <button class="icon-btn" (click)="back()" aria-label="Voltar">
+          <span class="material-symbols-rounded icon-md">arrow_back</span>
+        </button>
+        <div>
+          <div class="detail__eyebrow">Projeto</div>
+          <h1 class="detail__title">{{ project.name }}</h1>
+          <div class="detail__sub">
+            <span class="detail__sub-item">
+              <span class="material-symbols-rounded icon-sm">business</span>
+              {{ project.companie?.name || '—' }}
+            </span>
+            <span class="detail__sub-item">
+              <span class="material-symbols-rounded icon-sm">date_range</span>
+              {{ period(project.startDate, project.endDate) }}
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="detail__actions">
+        <app-status-chip [label]="projectStatusLabel(project.status)"></app-status-chip>
+      </div>
+    </header>
+
+    <!-- Descrição -->
+    <section class="card-surface card-surface--pad" *ngIf="project.description">
+      <h2 class="section-title">
+        <span class="material-symbols-rounded icon-md">notes</span>
+        Descrição
+      </h2>
+      <p class="reason-block__text">{{ project.description }}</p>
+    </section>
+
+    <!-- Chamados vinculados -->
+    <section class="card-surface card-surface--pad">
+      <div class="section-head">
+        <h2 class="section-title">
+          <span class="material-symbols-rounded icon-md">support_agent</span>
+          Chamados vinculados
+        </h2>
+        <button class="btn-ghost" (click)="toggleLink()">
+          <span class="material-symbols-rounded icon-sm">{{ showLink ? 'close' : 'add_link' }}</span>
+          {{ showLink ? 'Cancelar' : 'Vincular chamado' }}
+        </button>
+      </div>
+
+      <!-- Picker -->
+      <div class="link-panel" *ngIf="showLink">
+        <app-combobox
+          class="link-panel__combo"
+          [options]="linkOptions"
+          [value]="linkTarget"
+          [placeholder]="loadingCalleds ? 'Carregando…' : 'Selecione um chamado'"
+          searchPlaceholder="Buscar chamado…"
+          emptyMessage="Nenhum chamado disponível"
+          (valueChange)="linkTarget = $event">
+        </app-combobox>
+        <button class="btn-primary-brand" (click)="linkCalled()" [disabled]="linkTarget == null || linking">
+          <span class="material-symbols-rounded icon-sm">check</span>
+          Vincular
+        </button>
+      </div>
+
+      <app-empty-state
+        *ngIf="calleds.length === 0"
+        icon="link_off"
+        title="Nenhum chamado vinculado"
+        description="Use o botão Vincular chamado para associar chamados a este projeto.">
+      </app-empty-state>
+
+      <ul class="link-list" *ngIf="calleds.length">
+        <li class="link-item" *ngFor="let link of calleds">
+          <div class="link-item__main">
+            <strong class="link-item__title">#{{ link.call?.id }} · {{ link.call?.reason || 'Sem motivo' }}</strong>
+            <div class="link-item__meta">
+              <span class="link-item__chip">
+                <span class="material-symbols-rounded icon-sm">business</span>
+                {{ link.call?.primaryCompanie?.name || '—' }}
+              </span>
+              <span class="link-item__chip">
+                <span class="material-symbols-rounded icon-sm">person</span>
+                {{ link.call?.user?.name || '—' }}
+              </span>
+            </div>
+          </div>
+          <div class="link-item__side">
+            <app-status-chip [label]="link.call?.statusId?.status || 'Sem status'"></app-status-chip>
+            <button class="row-action row-action--danger" title="Remover vínculo" (click)="removeCalled(link.id)">
+              <span class="material-symbols-rounded icon-sm">delete</span>
+            </button>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <!-- Cronograma -->
+    <section class="card-surface card-surface--pad">
+      <div class="section-head">
+        <h2 class="section-title">
+          <span class="material-symbols-rounded icon-md">calendar_month</span>
+          Cronograma
+        </h2>
+        <button class="btn-primary-brand" (click)="openNewTask()">
+          <span class="material-symbols-rounded icon-sm">add</span>
+          Nova tarefa
+        </button>
+      </div>
+
+      <app-empty-state
+        *ngIf="tasks.length === 0"
+        icon="task"
+        title="Nenhuma tarefa no cronograma"
+        description="Use o botão Nova tarefa para começar a planejar.">
+      </app-empty-state>
+
+      <ul class="task-list" *ngIf="tasks.length">
+        <li class="task-item" *ngFor="let task of tasks">
+          <div class="task-item__top">
+            <div class="task-item__heading">
+              <strong class="task-item__title">{{ task.title }}</strong>
+              <div class="task-item__meta">
+                <span class="task-item__chip">
+                  <span class="material-symbols-rounded icon-sm">person</span>
+                  {{ task.responsible?.name || '—' }}
+                </span>
+                <span class="task-item__chip">
+                  <span class="material-symbols-rounded icon-sm">date_range</span>
+                  {{ period(task.startDate, task.dueDate) }}
+                </span>
+              </div>
+            </div>
+            <div class="task-item__side">
+              <app-status-chip [label]="taskStatusLabel(task.status)"></app-status-chip>
+              <button class="row-action" title="Editar tarefa" (click)="openEditTask(task)">
+                <span class="material-symbols-rounded icon-sm">edit</span>
+              </button>
+              <button class="row-action row-action--danger" title="Excluir tarefa" (click)="deleteTask(task.id)">
+                <span class="material-symbols-rounded icon-sm">delete</span>
+              </button>
+            </div>
+          </div>
+
+          <p class="task-item__desc" *ngIf="task.description">{{ task.description }}</p>
+
+          <div class="progress">
+            <div class="progress__track">
+              <div class="progress__bar" [style.width.%]="clampProgress(task.progress)"></div>
+            </div>
+            <span class="progress__value">{{ clampProgress(task.progress) }}%</span>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+  </div>
+</app-shell>

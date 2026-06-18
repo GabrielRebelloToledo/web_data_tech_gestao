@@ -14,6 +14,8 @@ import { ReportsComponent } from './components/reports/reports/reports.component
 import { ImagesComponent } from './components/images/images.component';
 import { KbComponent } from './components/kb/kb.component';
 import { UsergroupsComponent } from './components/usergroups/usergroups.component';
+import { ProjetosComponent } from './components/projetos/projetos.component';
+import { ProjetoDetalheComponent } from './components/projetos/projeto-detalhe.component';
 
 export const routes: Routes = [
     { path: '', component: LoginComponent, canActivate: [LoginGuard] },
@@ -25,6 +27,9 @@ export const routes: Routes = [
     // Legacy redirects — keep old links working
     { path: 'view/:id', component: CalledDetailComponent, canActivate: [AuthGuard] },
     { path: 'history/:id', component: CalledDetailComponent, canActivate: [AuthGuard] },
+
+    { path: 'projetos', component: ProjetosComponent, canActivate: [AuthGuard] },
+    { path: 'projeto/:id', component: ProjetoDetalheComponent, canActivate: [AuthGuard] },
 
     { path: 'setores', component: SetoresComponent, canActivate: [AuthGuard] },
     { path: 'companies', component: CompaniesComponent, canActivate: [AuthGuard] },

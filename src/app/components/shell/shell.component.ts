@@ -46,6 +46,7 @@ export class ShellComponent implements OnInit {
   operationalItems: NavItem[] = [
     { key: 'home', label: 'Início', icon: 'dashboard', route: '/inicio' },
     { key: 'new', label: 'Abrir Chamado', icon: 'add_circle', action: 'new-ticket' },
+    { key: 'projetos', label: 'Projetos', icon: 'calendar_month', route: '/projetos' },
   ];
 
   adminItems: NavItem[] = [

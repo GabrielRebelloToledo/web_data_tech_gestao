@@ -1,0 +1,68 @@
+<app-shell activePage="projetos" pageTitle="Projetos"
+           [breadcrumbs]="[{label:'Operação'},{label:'Projetos'}]">
+
+  <section class="list-page">
+    <header class="list-page__header">
+      <div>
+        <h2 class="list-page__title">Projetos</h2>
+        <p class="list-page__subtitle">Acompanhe projetos, chamados vinculados e o cronograma de tarefas.</p>
+      </div>
+      <div class="list-page__actions">
+        <label class="search">
+          <span class="material-symbols-rounded icon-sm">search</span>
+          <input type="search"
+                 placeholder="Buscar por nome, empresa, status..."
+                 [ngModel]="searchTerm()"
+                 (ngModelChange)="onSearchChange($event)" />
+        </label>
+        <button class="icon-btn" (click)="loadProjects()" title="Atualizar" aria-label="Atualizar">
+          <span class="material-symbols-rounded icon-md">refresh</span>
+        </button>
+        <button class="btn-primary-brand" (click)="openDynamicForm()">
+          <span class="material-symbols-rounded icon-sm">add</span>
+          Novo projeto
+        </button>
+      </div>
+    </header>
+
+    <!-- Loading -->
+    <div class="list-page__skeleton card-surface" *ngIf="loading()">
+      <div class="skeleton-row" *ngFor="let i of [0,1,2,3,4]">
+        <app-skeleton width="60px" height="18px"></app-skeleton>
+        <app-skeleton width="30%" height="18px"></app-skeleton>
+        <app-skeleton width="20%" height="18px"></app-skeleton>
+        <app-skeleton width="20%" height="18px"></app-skeleton>
+        <app-skeleton width="10%" height="18px"></app-skeleton>
+      </div>
+    </div>
+
+    <!-- Empty -->
+    <div class="card-surface list-page__empty" *ngIf="!loading() && projects().length === 0">
+      <app-empty-state
+        icon="calendar_month"
+        title="Nenhum projeto cadastrado"
+        description="Use o botão Novo projeto para iniciar o cadastro.">
+      </app-empty-state>
+    </div>
+
+    <!-- Grid -->
+    <div class="list-page__grid card-surface" *ngIf="!loading() && projects().length">
+      <ag-grid-angular
+        class="admin-ag-grid"
+        [rowData]="projects()"
+        [columnDefs]="colDefs"
+        [defaultColDef]="defaultColDef"
+        [theme]="gridTheme()"
+        [localeText]="localeText"
+        [rowHeight]="56"
+        [headerHeight]="48"
+        [animateRows]="true"
+        [pagination]="true"
+        [paginationPageSize]="15"
+        [paginationPageSizeSelector]="[10, 15, 25, 50, 100]"
+        [suppressCellFocus]="true"
+        (gridReady)="onGridReady($event)">
+      </ag-grid-angular>
+    </div>
+  </section>
+</app-shell>
