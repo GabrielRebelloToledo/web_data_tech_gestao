@@ -189,6 +189,7 @@ export class CompaniesComponent implements OnInit {
         { name: 'aiModel', placeholder: 'Modelo de IA (opcional)', type: 'text', required: false, helper: 'Vazio = modelo padrão do provedor.' },
         { name: 'aiConfidenceThreshold', placeholder: 'Confiança mínima (%)', type: 'number', required: false, defaultValue: 75 },
         { name: 'aiApiKey', placeholder: 'Chave de API da IA (opcional)', type: 'password', required: false, helper: 'Vazio = usa a chave global do sistema.' },
+        { name: 'valorHora', placeholder: 'Valor da hora (R$)', type: 'number', required: false, helper: 'Usado no faturamento (horas × valor).' },
       ]
     }];
 
@@ -224,7 +225,8 @@ export class CompaniesComponent implements OnInit {
         { name: 'aiProvider', placeholder: 'Provedor de IA', type: 'select', required: false, defaultValue: company.aiProvider || 'CLAUDE', options: [{ id: 'CLAUDE', name: 'Claude' }, { id: 'OPENAI', name: 'ChatGPT (OpenAI)' }] },
         { name: 'aiModel', placeholder: 'Modelo de IA (opcional)', type: 'text', required: false, defaultValue: company.aiModel || '', helper: 'Vazio = modelo padrão do provedor.' },
         { name: 'aiConfidenceThreshold', placeholder: 'Confiança mínima (%)', type: 'number', required: false, defaultValue: company.aiConfidenceThreshold ?? 75 },
-        { name: 'aiApiKey', placeholder: 'Chave de API da IA', type: 'password', required: false, helper: 'Vazio = mantém a chave atual / usa a global.' }
+        { name: 'aiApiKey', placeholder: 'Chave de API da IA', type: 'password', required: false, helper: 'Vazio = mantém a chave atual / usa a global.' },
+        { name: 'valorHora', placeholder: 'Valor da hora (R$)', type: 'number', required: false, defaultValue: company.valorHora ?? '', helper: 'Usado no faturamento (horas × valor).' }
       ]
     }];
 

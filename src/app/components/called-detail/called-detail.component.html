@@ -164,6 +164,73 @@
 
       <!-- Timeline + new comment -->
       <section class="detail__timeline">
+
+        <!-- Horas / Apontamentos -->
+        <div class="card-surface card-surface--pad hours-card">
+          <div class="section-head">
+            <h2 class="section-title">
+              <span class="material-symbols-rounded icon-md">schedule</span>
+              Horas / Apontamentos
+            </h2>
+            <button class="btn-primary-brand" (click)="openNewApontamento()">
+              <span class="material-symbols-rounded icon-sm">add</span>
+              Lançar horas
+            </button>
+          </div>
+
+          <div class="stack" *ngIf="loadingApontamentos">
+            <app-skeleton height="44px"></app-skeleton>
+            <app-skeleton height="44px"></app-skeleton>
+          </div>
+
+          <ng-container *ngIf="!loadingApontamentos">
+            <app-empty-state
+              *ngIf="apontamentos.length === 0"
+              icon="schedule"
+              title="Nenhuma hora lançada"
+              description="Use o botão Lançar horas para registrar o tempo trabalhado.">
+            </app-empty-state>
+
+            <ul class="hours-list" *ngIf="apontamentos.length">
+              <li class="hours-item" *ngFor="let ap of apontamentos">
+                <div class="hours-item__main">
+                  <div class="hours-item__top">
+                    <strong class="hours-item__hours">{{ ap.hours }}h</strong>
+                    <app-status-chip
+                      [label]="apontamentoStatusLabel(ap.status)"
+                      [variant]="ap.status === 'ABERTO' ? 'warning' : (ap.status === 'PAGO' ? 'success' : 'info')">
+                    </app-status-chip>
+                  </div>
+                  <p class="hours-item__desc" *ngIf="ap.description">{{ ap.description }}</p>
+                  <div class="hours-item__meta">
+                    <span class="hours-item__chip">
+                      <span class="material-symbols-rounded icon-sm">event</span>
+                      {{ ap.date | date:'dd/MM/yyyy' }}
+                    </span>
+                    <span class="hours-item__chip">
+                      <span class="material-symbols-rounded icon-sm">person</span>
+                      {{ ap.user?.name || '—' }}
+                    </span>
+                  </div>
+                </div>
+                <div class="hours-item__side" *ngIf="isApontamentoEditable(ap)">
+                  <button class="row-action" title="Editar apontamento" (click)="openEditApontamento(ap)">
+                    <span class="material-symbols-rounded icon-sm">edit</span>
+                  </button>
+                  <button class="row-action row-action--danger" title="Excluir apontamento" (click)="deleteApontamento(ap)">
+                    <span class="material-symbols-rounded icon-sm">delete</span>
+                  </button>
+                </div>
+              </li>
+            </ul>
+
+            <div class="hours-total" *ngIf="apontamentos.length">
+              <span class="hours-total__label">Total de horas</span>
+              <strong class="hours-total__value">{{ totalHours() | number:'1.0-2' }} h</strong>
+            </div>
+          </ng-container>
+        </div>
+
         <div class="card-surface card-surface--pad">
           <h2 class="section-title">
             <span class="material-symbols-rounded icon-md">forum</span>

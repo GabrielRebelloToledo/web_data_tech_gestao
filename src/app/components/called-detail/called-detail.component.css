@@ -176,7 +176,87 @@
 .attachment-chip__remove:hover { background: rgba(0,0,0,0.05); }
 
 /* Timeline column */
+.detail__timeline { display: flex; flex-direction: column; gap: 24px; }
 .card-surface--pad { padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+
+/* Horas / apontamentos */
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.stack { display: flex; flex-direction: column; gap: 8px; }
+.hours-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.hours-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+.hours-item__main { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.hours-item__top { display: flex; align-items: center; gap: 10px; }
+.hours-item__hours { font-size: 15px; font-weight: 800; color: var(--color-foreground); }
+.hours-item__desc {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-foreground);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.hours-item__meta { display: flex; flex-wrap: wrap; gap: 12px; }
+.hours-item__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--color-muted-fg);
+  font-weight: 500;
+}
+.hours-item__side { display: flex; align-items: center; gap: 8px; }
+.hours-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--color-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+.hours-total__label { font-size: 13px; font-weight: 600; color: var(--color-muted-fg); }
+.hours-total__value { font-size: 16px; font-weight: 800; color: var(--color-foreground); }
+
+.row-action {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-foreground);
+  transition: background 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+.row-action:hover { background: var(--color-muted); }
+.row-action--danger:hover {
+  color: var(--color-danger, #DC2626);
+  border-color: var(--color-danger, #DC2626);
+}
 
 /* Comment form */
 .comment-form {

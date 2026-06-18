@@ -1,0 +1,190 @@
+<app-shell activePage="faturamento" pageTitle="Faturamento" [breadcrumbs]="breadcrumbs()">
+
+  <div class="detail">
+
+    <!-- Header -->
+    <header class="detail__header">
+      <div class="detail__heading">
+        <div>
+          <div class="detail__eyebrow">Cobrança</div>
+          <h1 class="detail__title">Faturamento de horas</h1>
+        </div>
+      </div>
+    </header>
+
+    <!-- Abas -->
+    <div class="tabs">
+      <button class="tab" [class.tab--active]="tab() === 'gerar'" (click)="setTab('gerar')">
+        <span class="material-symbols-rounded icon-sm">add_card</span>
+        Gerar fechamento
+      </button>
+      <button class="tab" [class.tab--active]="tab() === 'lista'" (click)="setTab('lista')">
+        <span class="material-symbols-rounded icon-sm">receipt_long</span>
+        Faturamentos
+      </button>
+    </div>
+
+    <!-- ── Gerar fechamento ─────────────────────────────────────────────── -->
+    <section class="card-surface card-surface--pad" *ngIf="tab() === 'gerar'">
+      <h2 class="section-title">
+        <span class="material-symbols-rounded icon-md">business</span>
+        Empresa
+      </h2>
+
+      <div class="picker">
+        <app-combobox
+          class="picker__combo"
+          [options]="companies()"
+          labelKey="name"
+          valueKey="id"
+          [value]="selectedCompanieId()"
+          placeholder="Selecione a empresa"
+          searchPlaceholder="Buscar empresa…"
+          emptyMessage="Nenhuma empresa"
+          (valueChange)="onCompanieChange($event)">
+        </app-combobox>
+
+        <div class="picker__rate" *ngIf="selectedCompanie()">
+          <span class="picker__rate-label">Valor/hora</span>
+          <strong class="picker__rate-value">R$ {{ valorHora() | number:'1.2-2' }}</strong>
+        </div>
+      </div>
+
+      <p class="hint hint--warn" *ngIf="selectedCompanie() && valorHora() <= 0">
+        <span class="material-symbols-rounded icon-sm">warning</span>
+        Esta empresa não tem valor/hora definido. Defina-o no cadastro da empresa antes de gerar o fechamento.
+      </p>
+
+      <!-- Loading apontamentos -->
+      <div class="stack" *ngIf="loadingOpen()">
+        <app-skeleton height="48px"></app-skeleton>
+        <app-skeleton height="48px"></app-skeleton>
+        <app-skeleton height="48px"></app-skeleton>
+      </div>
+
+      <ng-container *ngIf="selectedCompanieId() != null && !loadingOpen()">
+        <app-empty-state
+          *ngIf="openItems().length === 0"
+          icon="inbox"
+          title="Nenhum apontamento em aberto"
+          description="Não há horas a faturar para esta empresa.">
+        </app-empty-state>
+
+        <div class="table-wrap" *ngIf="openItems().length">
+          <table class="bill-table">
+            <thead>
+              <tr>
+                <th class="col-check">
+                  <input type="checkbox" [checked]="allSelected()" (change)="toggleAll()" aria-label="Selecionar todos" />
+                </th>
+                <th>Chamado</th>
+                <th>Descrição</th>
+                <th>Autor</th>
+                <th class="col-right">Data</th>
+                <th class="col-right">Horas</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let it of openItems()" [class.row--selected]="isSelected(it.id)" (click)="toggleItem(it.id)">
+                <td class="col-check">
+                  <input type="checkbox" [checked]="isSelected(it.id)" (click)="$event.stopPropagation()" (change)="toggleItem(it.id)" />
+                </td>
+                <td class="cell-strong">#{{ it.call?.id }} · {{ it.call?.reason || 'Sem motivo' }}</td>
+                <td class="cell-muted">{{ it.description || '—' }}</td>
+                <td class="cell-muted">{{ it.user?.name || '—' }}</td>
+                <td class="col-right cell-muted">{{ it.date | date:'dd/MM/yyyy' }}</td>
+                <td class="col-right cell-strong">{{ num(it.hours) | number:'1.0-2' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Resumo + ação -->
+        <div class="summary-bar" *ngIf="openItems().length">
+          <div class="summary-bar__totals">
+            <div class="summary-stat">
+              <span class="summary-stat__label">Horas selecionadas</span>
+              <strong class="summary-stat__value">{{ selectedHours() | number:'1.0-2' }}</strong>
+            </div>
+            <div class="summary-stat">
+              <span class="summary-stat__label">Total estimado</span>
+              <strong class="summary-stat__value summary-stat__value--accent">R$ {{ liveTotal() | number:'1.2-2' }}</strong>
+            </div>
+          </div>
+          <button class="btn-primary-brand" (click)="generate()" [disabled]="!canGenerate()">
+            <span class="material-symbols-rounded icon-sm">add_card</span>
+            Gerar fechamento
+          </button>
+        </div>
+      </ng-container>
+    </section>
+
+    <!-- ── Faturamentos ─────────────────────────────────────────────────── -->
+    <section class="card-surface card-surface--pad" *ngIf="tab() === 'lista'">
+      <div class="section-head">
+        <h2 class="section-title">
+          <span class="material-symbols-rounded icon-md">receipt_long</span>
+          Faturamentos
+        </h2>
+        <div class="filter">
+          <span class="filter__label">Status</span>
+          <select class="select" [ngModel]="statusFilter()" (ngModelChange)="onStatusFilterChange($event)">
+            <option *ngFor="let o of statusOptions" [value]="o.id">{{ o.name }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="stack" *ngIf="loadingList()">
+        <app-skeleton height="48px"></app-skeleton>
+        <app-skeleton height="48px"></app-skeleton>
+        <app-skeleton height="48px"></app-skeleton>
+      </div>
+
+      <ng-container *ngIf="!loadingList()">
+        <app-empty-state
+          *ngIf="faturamentos().length === 0"
+          icon="receipt_long"
+          title="Nenhum faturamento"
+          description="Gere um fechamento na aba ao lado para começar.">
+        </app-empty-state>
+
+        <div class="table-wrap" *ngIf="faturamentos().length">
+          <table class="bill-table">
+            <thead>
+              <tr>
+                <th>Cód.</th>
+                <th>Empresa</th>
+                <th class="col-right">Total</th>
+                <th>Status</th>
+                <th class="col-right">Gerado em</th>
+                <th class="col-right">Pago em</th>
+                <th class="col-right">Ação</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let f of faturamentos()" (click)="open(f.id)" class="row--clickable">
+                <td class="cell-id">#{{ f.id }}</td>
+                <td class="cell-strong">{{ f.companie?.name || '—' }}</td>
+                <td class="col-right cell-strong">R$ {{ num(f.total) | number:'1.2-2' }}</td>
+                <td>
+                  <app-status-chip
+                    [label]="f.status === 'PAGO' ? 'Pago' : 'Aberto'"
+                    [variant]="f.status === 'PAGO' ? 'success' : 'warning'">
+                  </app-status-chip>
+                </td>
+                <td class="col-right cell-muted">{{ f.createdAt | date:'dd/MM/yyyy' }}</td>
+                <td class="col-right cell-muted">{{ f.paidAt ? (f.paidAt | date:'dd/MM/yyyy') : '—' }}</td>
+                <td class="col-right">
+                  <button class="row-action" title="Abrir faturamento" (click)="$event.stopPropagation(); open(f.id)">
+                    <span class="material-symbols-rounded icon-sm">open_in_new</span>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </ng-container>
+    </section>
+
+  </div>
+</app-shell>

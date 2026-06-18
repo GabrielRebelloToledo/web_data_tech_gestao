@@ -1,0 +1,126 @@
+<app-shell activePage="faturamento" [breadcrumbs]="breadcrumbs()">
+
+  <!-- Loading -->
+  <div class="detail" *ngIf="loading">
+    <div class="detail__header">
+      <app-skeleton width="260px" height="32px"></app-skeleton>
+      <app-skeleton width="160px" height="32px" [rounded]="true"></app-skeleton>
+    </div>
+    <div class="card-surface card-surface--pad">
+      <app-skeleton height="24px" width="180px"></app-skeleton>
+      <app-skeleton height="64px"></app-skeleton>
+      <app-skeleton height="64px"></app-skeleton>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <app-empty-state
+    *ngIf="!loading && errorMessage"
+    icon="report"
+    [title]="'Faturamento não encontrado'"
+    [description]="errorMessage">
+    <button class="btn-ghost" (click)="back()">Voltar</button>
+  </app-empty-state>
+
+  <!-- Loaded -->
+  <div class="detail" *ngIf="!loading && faturamento && !errorMessage" id="bill-print">
+
+    <!-- Header -->
+    <header class="detail__header">
+      <div class="detail__heading">
+        <button class="icon-btn no-print" (click)="back()" aria-label="Voltar">
+          <span class="material-symbols-rounded icon-md">arrow_back</span>
+        </button>
+        <div>
+          <div class="detail__eyebrow">Faturamento #{{ faturamento.id }}</div>
+          <h1 class="detail__title">{{ faturamento.companie?.name || '—' }}</h1>
+          <div class="detail__sub">
+            <span class="detail__sub-item">
+              <span class="material-symbols-rounded icon-sm">event</span>
+              Gerado em {{ faturamento.createdAt | date:'dd/MM/yyyy' }}
+            </span>
+            <span class="detail__sub-item" *ngIf="faturamento.paidAt">
+              <span class="material-symbols-rounded icon-sm">paid</span>
+              Pago em {{ faturamento.paidAt | date:'dd/MM/yyyy' }}
+            </span>
+            <span class="detail__sub-item">
+              <span class="material-symbols-rounded icon-sm">schedule</span>
+              Valor/hora R$ {{ num(faturamento.valorHora) | number:'1.2-2' }}
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="detail__actions">
+        <app-status-chip
+          [label]="isOpen ? 'Aberto' : 'Pago'"
+          [variant]="isOpen ? 'warning' : 'success'">
+        </app-status-chip>
+      </div>
+    </header>
+
+    <!-- Ações -->
+    <div class="actions-bar no-print">
+      <button class="btn-ghost" (click)="print()">
+        <span class="material-symbols-rounded icon-sm">print</span>
+        Imprimir
+      </button>
+      <button class="btn-primary-brand" *ngIf="isOpen" (click)="pay()" [disabled]="paying">
+        <span class="material-symbols-rounded icon-sm">paid</span>
+        Baixar (marcar pago)
+      </button>
+      <button class="btn-ghost btn-ghost--danger" *ngIf="isOpen" (click)="estornar()" [disabled]="estornando">
+        <span class="material-symbols-rounded icon-sm">undo</span>
+        Estornar
+      </button>
+    </div>
+
+    <!-- Tabela -->
+    <section class="card-surface card-surface--pad">
+      <h2 class="section-title">
+        <span class="material-symbols-rounded icon-md">schedule</span>
+        Apontamentos
+      </h2>
+
+      <app-empty-state
+        *ngIf="apontamentos.length === 0"
+        icon="inbox"
+        title="Sem apontamentos"
+        description="Este faturamento não possui apontamentos.">
+      </app-empty-state>
+
+      <div class="table-wrap" *ngIf="apontamentos.length">
+        <table class="bill-table">
+          <thead>
+            <tr>
+              <th>Chamado</th>
+              <th>Descrição</th>
+              <th class="col-right">Data</th>
+              <th>Autor</th>
+              <th class="col-right">Horas</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let a of apontamentos">
+              <td class="cell-strong">#{{ a.call?.id }} · {{ a.call?.reason || 'Sem motivo' }}</td>
+              <td class="cell-muted">{{ a.description || '—' }}</td>
+              <td class="col-right cell-muted">{{ a.date | date:'dd/MM/yyyy' }}</td>
+              <td class="cell-muted">{{ a.user?.name || '—' }}</td>
+              <td class="col-right cell-strong">{{ num(a.hours) | number:'1.0-2' }}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr class="total-row">
+              <td colspan="4" class="col-right">Total</td>
+              <td class="col-right">{{ totalHours() | number:'1.0-2' }} h</td>
+            </tr>
+            <tr class="total-row total-row--accent">
+              <td colspan="4" class="col-right">Total a faturar</td>
+              <td class="col-right">R$ {{ num(faturamento.total) | number:'1.2-2' }}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </section>
+
+  </div>
+</app-shell>

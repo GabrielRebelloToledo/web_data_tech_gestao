@@ -16,6 +16,8 @@ import { KbComponent } from './components/kb/kb.component';
 import { UsergroupsComponent } from './components/usergroups/usergroups.component';
 import { ProjetosComponent } from './components/projetos/projetos.component';
 import { ProjetoDetalheComponent } from './components/projetos/projeto-detalhe.component';
+import { FaturamentoComponent } from './components/faturamento/faturamento.component';
+import { FaturamentoDetalheComponent } from './components/faturamento/faturamento-detalhe.component';
 
 export const routes: Routes = [
     { path: '', component: LoginComponent, canActivate: [LoginGuard] },
@@ -30,6 +32,9 @@ export const routes: Routes = [
 
     { path: 'projetos', component: ProjetosComponent, canActivate: [AuthGuard] },
     { path: 'projeto/:id', component: ProjetoDetalheComponent, canActivate: [AuthGuard] },
+
+    { path: 'faturamento', component: FaturamentoComponent, canActivate: [AuthGuard] },
+    { path: 'faturamento/:id', component: FaturamentoDetalheComponent, canActivate: [AuthGuard] },
 
     { path: 'setores', component: SetoresComponent, canActivate: [AuthGuard] },
     { path: 'companies', component: CompaniesComponent, canActivate: [AuthGuard] },

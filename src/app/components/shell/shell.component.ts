@@ -55,6 +55,7 @@ export class ShellComponent implements OnInit {
     { key: 'usuarios', label: 'Usuários', icon: 'group', route: '/usuarios', adminOnly: true },
     { key: 'usergroups', label: 'Grupos de Usuários', icon: 'groups', route: '/grupos-usuarios', adminOnly: true },
     { key: 'kb', label: 'Base de Conhecimento', icon: 'library_books', route: '/kb-articles', adminOnly: true },
+    { key: 'faturamento', label: 'Faturamento', icon: 'request_quote', route: '/faturamento', adminOnly: true },
     { key: 'images', label: 'Imagens', icon: 'image', route: '/images', adminOnly: true },
   ];
 

@@ -19,6 +19,9 @@ import { CalledsService } from '../calleds/calleds.service';
 import { CalledDetailsService } from '../called-details/called-details.service';
 import { FormService } from '../form/form.service';
 import { UserService } from '../core/user/user.service';
+import { BillingService } from '../faturamento/billing.service';
+import { FormComponent, TabConfig } from '../form/form.component';
+import { MatDialog } from '@angular/material/dialog';
 
 type StatusOption = { id: number; status: string };
 
@@ -67,6 +70,10 @@ export class CalledDetailComponent implements OnInit {
   transferTarget: any = '';
   transferring = false;
 
+  // Horas / apontamentos
+  apontamentos: any[] = [];
+  loadingApontamentos = true;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -75,7 +82,9 @@ export class CalledDetailComponent implements OnInit {
     private detailService: CalledDetailsService,
     private formService: FormService,
     private userService: UserService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private billing: BillingService,
+    private dialog: MatDialog
   ) {
     this.currentUserId = this.userService.user?.id;
     this.currentUserType = (this.userService.user as any)?.type || '';
@@ -94,6 +103,113 @@ export class CalledDetailComponent implements OnInit {
     this.loadHistory();
     this.loadAttachments();
     this.loadStatuses();
+    this.loadApontamentos();
+  }
+
+  // ── Horas / apontamentos ─────────────────────────────────────────────
+  loadApontamentos() {
+    if (!this.id) return;
+    this.loadingApontamentos = true;
+    this.billing.listApontamentos(this.id).subscribe({
+      next: (data: any[]) => {
+        this.apontamentos = data || [];
+        this.loadingApontamentos = false;
+      },
+      error: () => { this.apontamentos = []; this.loadingApontamentos = false; }
+    });
+  }
+
+  totalHours(): number {
+    return this.apontamentos.reduce((sum: number, a: any) => sum + (Number(a.hours) || 0), 0);
+  }
+
+  isApontamentoEditable(ap: any): boolean {
+    return ap?.status === 'ABERTO';
+  }
+
+  private toInputDate(value: any): string {
+    if (!value) return '';
+    const d = new Date(value);
+    if (isNaN(d.getTime())) return '';
+    return d.toISOString().slice(0, 10);
+  }
+
+  openNewApontamento() {
+    if (!this.id) return;
+    const formConfig: TabConfig[] = [{
+      title: 'Lançar horas',
+      fields: [
+        { name: 'calledId', placeholder: 'Cód. do chamado', type: 'number', required: true, visible: true, defaultValue: Number(this.id) },
+        { name: 'hours', placeholder: 'Horas', type: 'number', required: true },
+        { name: 'description', placeholder: 'O que foi feito', type: 'txtarea', required: false },
+        { name: 'date', placeholder: 'Data', type: 'date', required: false }
+      ]
+    }];
+
+    this.dialog.open(FormComponent, {
+      width: 'min(560px, 94vw)',
+      maxWidth: '94vw',
+      maxHeight: '92vh',
+      panelClass: 'shell-dialog',
+      data: {
+        tabs: formConfig,
+        url: 'billing/apontamentos',
+        callId: '',
+        skipReload: true,
+        header: { icon: 'schedule', eyebrow: 'Apontamento', title: 'Lançar horas', subtitle: 'Registre as horas trabalhadas neste chamado.' },
+        submitLabel: 'Lançar horas',
+        submitIcon: 'check'
+      }
+    }).afterClosed().subscribe(() => this.loadApontamentos());
+  }
+
+  openEditApontamento(ap: any) {
+    const formConfig: TabConfig[] = [{
+      title: 'Editar apontamento',
+      fields: [
+        { name: 'id', placeholder: 'Cód.', type: 'number', required: true, visible: true, defaultValue: ap.id },
+        { name: 'hours', placeholder: 'Horas', type: 'number', required: true, defaultValue: ap.hours },
+        { name: 'description', placeholder: 'O que foi feito', type: 'txtarea', required: false, defaultValue: ap.description },
+        { name: 'date', placeholder: 'Data', type: 'date', required: false, defaultValue: this.toInputDate(ap.date) }
+      ]
+    }];
+
+    this.dialog.open(FormComponent, {
+      width: 'min(560px, 94vw)',
+      maxWidth: '94vw',
+      maxHeight: '92vh',
+      panelClass: 'shell-dialog',
+      data: {
+        tabs: formConfig,
+        url: `billing/apontamentos/update/${ap.id}`,
+        callId: '',
+        skipReload: true,
+        header: { icon: 'schedule', eyebrow: 'Apontamento', title: 'Editar apontamento', subtitle: 'Atualize as horas lançadas.' },
+        submitLabel: 'Salvar alterações',
+        submitIcon: 'check'
+      }
+    }).afterClosed().subscribe(() => this.loadApontamentos());
+  }
+
+  deleteApontamento(ap: any) {
+    if (!this.isApontamentoEditable(ap)) return;
+    if (!confirm('Excluir este apontamento de horas?')) return;
+    this.billing.deleteApontamento(ap.id).subscribe({
+      next: () => {
+        this.snackBar.open('Apontamento excluído', 'Fechar', { duration: 2500, panelClass: ['snackbar-success'] });
+        this.loadApontamentos();
+      },
+      error: (err) => {
+        const msg = err?.error?.message?.message || 'Não foi possível excluir o apontamento';
+        this.snackBar.open(msg, 'Fechar', { duration: 3500, panelClass: ['snackbar-error'] });
+      }
+    });
+  }
+
+  apontamentoStatusLabel(status: string): string {
+    if (status === 'FATURADO') return 'Faturado';
+    if (status === 'PAGO') return 'Pago';
+    return 'Aberto';
   }
 
   loadAttachments() {
