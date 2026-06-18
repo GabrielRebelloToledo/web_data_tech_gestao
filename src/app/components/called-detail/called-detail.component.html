@@ -166,13 +166,13 @@
       <section class="detail__timeline">
 
         <!-- Horas / Apontamentos -->
-        <div class="card-surface card-surface--pad hours-card">
+        <div class="card-surface card-surface--pad hours-card" *ngIf="canViewApontamentos()">
           <div class="section-head">
             <h2 class="section-title">
               <span class="material-symbols-rounded icon-md">schedule</span>
               Horas / Apontamentos
             </h2>
-            <button class="btn-primary-brand" (click)="openNewApontamento()">
+            <button class="btn-primary-brand" *ngIf="canCreateApontamento()" (click)="openNewApontamento()">
               <span class="material-symbols-rounded icon-sm">add</span>
               Lançar horas
             </button>
@@ -217,7 +217,7 @@
                   <button class="row-action" title="Editar apontamento" (click)="openEditApontamento(ap)">
                     <span class="material-symbols-rounded icon-sm">edit</span>
                   </button>
-                  <button class="row-action row-action--danger" title="Excluir apontamento" (click)="deleteApontamento(ap)">
+                  <button class="row-action row-action--danger" *ngIf="canDeleteApontamento(ap)" title="Excluir apontamento" (click)="deleteApontamento(ap)">
                     <span class="material-symbols-rounded icon-sm">delete</span>
                   </button>
                 </div>

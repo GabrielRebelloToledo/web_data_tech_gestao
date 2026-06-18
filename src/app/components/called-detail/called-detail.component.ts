@@ -20,6 +20,7 @@ import { CalledDetailsService } from '../called-details/called-details.service';
 import { FormService } from '../form/form.service';
 import { UserService } from '../core/user/user.service';
 import { BillingService } from '../faturamento/billing.service';
+import { PermissionsService } from '../core/permissions/permissions.service';
 import { FormComponent, TabConfig } from '../form/form.component';
 import { MatDialog } from '@angular/material/dialog';
 
@@ -84,7 +85,8 @@ export class CalledDetailComponent implements OnInit {
     private userService: UserService,
     private snackBar: MatSnackBar,
     private billing: BillingService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    public perm: PermissionsService
   ) {
     this.currentUserId = this.userService.user?.id;
     this.currentUserType = (this.userService.user as any)?.type || '';
@@ -125,6 +127,19 @@ export class CalledDetailComponent implements OnInit {
 
   isApontamentoEditable(ap: any): boolean {
     return ap?.status === 'ABERTO';
+  }
+
+  // ── Permissões de apontamentos ───────────────────────────────────────
+  canViewApontamentos(): boolean {
+    return this.perm.can('APONTAMENTO', 'CONSULTA');
+  }
+
+  canCreateApontamento(): boolean {
+    return this.perm.can('APONTAMENTO', 'INSERCAO');
+  }
+
+  canDeleteApontamento(ap: any): boolean {
+    return this.isApontamentoEditable(ap) && this.perm.can('APONTAMENTO', 'EXCLUSAO');
   }
 
   private toInputDate(value: any): string {

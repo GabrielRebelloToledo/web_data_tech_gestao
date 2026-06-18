@@ -64,11 +64,11 @@
         <span class="material-symbols-rounded icon-sm">print</span>
         Imprimir
       </button>
-      <button class="btn-primary-brand" *ngIf="isOpen" (click)="pay()" [disabled]="paying">
+      <button class="btn-primary-brand" *ngIf="isOpen && canPay()" (click)="pay()" [disabled]="paying">
         <span class="material-symbols-rounded icon-sm">paid</span>
         Baixar (marcar pago)
       </button>
-      <button class="btn-ghost btn-ghost--danger" *ngIf="isOpen" (click)="estornar()" [disabled]="estornando">
+      <button class="btn-ghost btn-ghost--danger" *ngIf="isOpen && canEstornar()" (click)="estornar()" [disabled]="estornando">
         <span class="material-symbols-rounded icon-sm">undo</span>
         Estornar
       </button>

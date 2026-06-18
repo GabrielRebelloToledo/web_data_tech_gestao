@@ -1,0 +1,127 @@
+<app-shell activePage="permissoes" pageTitle="Permissões">
+
+  <div class="perms">
+
+    <header class="perms__header">
+      <div>
+        <div class="perms__eyebrow">Controle de acesso</div>
+        <h1 class="perms__title">Permissões por usuário</h1>
+        <p class="perms__hint">
+          Defina o que cada usuário pode consultar, inserir, excluir ou gerar.
+          Administradores têm acesso total.
+        </p>
+      </div>
+    </header>
+
+    <!-- Seletor de usuário -->
+    <section class="card-surface card-surface--pad perms__picker">
+      <label class="perms__label">Usuário</label>
+      <div class="perms__picker-control">
+        <div *ngIf="loadingUsers()" class="perms__skeleton">
+          <app-skeleton height="42px"></app-skeleton>
+        </div>
+        <app-combobox
+          *ngIf="!loadingUsers()"
+          [options]="userOptions()"
+          labelKey="name"
+          valueKey="id"
+          [value]="selectedUserId()"
+          placeholder="Selecione um usuário…"
+          searchPlaceholder="Buscar usuário…"
+          emptyMessage="Nenhum usuário encontrado"
+          (valueChange)="onUserChange($event)">
+        </app-combobox>
+      </div>
+    </section>
+
+    <!-- Estado vazio inicial -->
+    <app-empty-state
+      *ngIf="selectedUserId() == null && !loadingMatrix()"
+      icon="admin_panel_settings"
+      title="Selecione um usuário"
+      description="Escolha um usuário acima para visualizar e editar suas permissões.">
+    </app-empty-state>
+
+    <!-- Carregando matriz -->
+    <section class="card-surface card-surface--pad" *ngIf="loadingMatrix()">
+      <div class="stack">
+        <app-skeleton height="44px"></app-skeleton>
+        <app-skeleton height="44px"></app-skeleton>
+        <app-skeleton height="44px"></app-skeleton>
+      </div>
+    </section>
+
+    <!-- Aviso de administrador -->
+    <section
+      class="card-surface card-surface--pad perms__admin-note"
+      *ngIf="!loadingMatrix() && selectedUserId() != null && selectedUserIsAdmin()">
+      <span class="material-symbols-rounded icon-md">verified_user</span>
+      <div>
+        <strong>Administrador tem acesso total</strong>
+        <p>Usuários do tipo Administrador acessam todos os recursos. Não há permissões para gerir.</p>
+      </div>
+    </section>
+
+    <!-- Matriz -->
+    <section
+      class="card-surface perms__matrix-card"
+      *ngIf="!loadingMatrix() && selectedUserId() != null && !selectedUserIsAdmin()">
+
+      <div class="perms__matrix-scroll" *ngIf="features().length; else noFeatures">
+        <table class="perms-matrix">
+          <thead>
+            <tr>
+              <th class="perms-matrix__feature-col">Recurso</th>
+              <th
+                class="perms-matrix__action-col"
+                *ngFor="let action of ['CONSULTA','INSERCAO','EXCLUSAO','GERACAO']">
+                {{ actionLabel(action) }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let feature of features()">
+              <td class="perms-matrix__feature">{{ feature.label }}</td>
+              <td
+                class="perms-matrix__cell"
+                *ngFor="let action of ['CONSULTA','INSERCAO','EXCLUSAO','GERACAO']">
+                <label
+                  class="perms-check"
+                  *ngIf="feature.actions.includes(action); else noAction">
+                  <input
+                    type="checkbox"
+                    [checked]="isChecked(feature.feature, action)"
+                    (change)="toggle(feature.feature, action)" />
+                  <span class="perms-check__box">
+                    <span class="material-symbols-rounded icon-sm">check</span>
+                  </span>
+                </label>
+                <ng-template #noAction>
+                  <span class="perms-matrix__na">—</span>
+                </ng-template>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <ng-template #noFeatures>
+        <div class="card-surface--pad">
+          <app-empty-state
+            icon="block"
+            title="Nenhum recurso disponível"
+            description="Não há recursos configurados para gerir permissões.">
+          </app-empty-state>
+        </div>
+      </ng-template>
+
+      <div class="perms__footer" *ngIf="features().length">
+        <button class="btn-primary-brand" (click)="save()" [disabled]="saving()">
+          <span class="material-symbols-rounded icon-sm">save</span>
+          {{ saving() ? 'Salvando…' : 'Salvar' }}
+        </button>
+      </div>
+    </section>
+
+  </div>
+</app-shell>

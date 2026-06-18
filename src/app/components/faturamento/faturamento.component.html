@@ -111,7 +111,7 @@
               <strong class="summary-stat__value summary-stat__value--accent">R$ {{ liveTotal() | number:'1.2-2' }}</strong>
             </div>
           </div>
-          <button class="btn-primary-brand" (click)="generate()" [disabled]="!canGenerate()">
+          <button class="btn-primary-brand" *ngIf="canGenerateBilling()" (click)="generate()" [disabled]="!canGenerate()">
             <span class="material-symbols-rounded icon-sm">add_card</span>
             Gerar fechamento
           </button>

@@ -9,6 +9,7 @@ import { UserService } from '../core/user/user.service';
 import { PerfilComponent } from '../perfil/perfil.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ThemeService } from '../core/theme/theme.service';
+import { PermissionsService } from '../core/permissions/permissions.service';
 
 type NavItem = {
   key: string;
@@ -17,6 +18,7 @@ type NavItem = {
   route?: string;
   action?: 'new-ticket';
   adminOnly?: boolean;
+  feature?: string;
 };
 
 @Component({
@@ -46,16 +48,17 @@ export class ShellComponent implements OnInit {
   operationalItems: NavItem[] = [
     { key: 'home', label: 'Início', icon: 'dashboard', route: '/inicio' },
     { key: 'new', label: 'Abrir Chamado', icon: 'add_circle', action: 'new-ticket' },
-    { key: 'projetos', label: 'Projetos', icon: 'calendar_month', route: '/projetos' },
+    { key: 'projetos', label: 'Projetos', icon: 'calendar_month', route: '/projetos', feature: 'PROJETOS' },
   ];
 
   adminItems: NavItem[] = [
-    { key: 'companies', label: 'Empresas', icon: 'business', route: '/companies', adminOnly: true },
-    { key: 'setores', label: 'Catálogo de chamados', icon: 'account_tree', route: '/setores', adminOnly: true },
-    { key: 'usuarios', label: 'Usuários', icon: 'group', route: '/usuarios', adminOnly: true },
-    { key: 'usergroups', label: 'Grupos de Usuários', icon: 'groups', route: '/grupos-usuarios', adminOnly: true },
-    { key: 'kb', label: 'Base de Conhecimento', icon: 'library_books', route: '/kb-articles', adminOnly: true },
-    { key: 'faturamento', label: 'Faturamento', icon: 'request_quote', route: '/faturamento', adminOnly: true },
+    { key: 'companies', label: 'Empresas', icon: 'business', route: '/companies', adminOnly: true, feature: 'EMPRESAS' },
+    { key: 'setores', label: 'Catálogo de chamados', icon: 'account_tree', route: '/setores', adminOnly: true, feature: 'CATALOGO' },
+    { key: 'usuarios', label: 'Usuários', icon: 'group', route: '/usuarios', adminOnly: true, feature: 'USUARIOS' },
+    { key: 'usergroups', label: 'Grupos de Usuários', icon: 'groups', route: '/grupos-usuarios', adminOnly: true, feature: 'USUARIOS' },
+    { key: 'kb', label: 'Base de Conhecimento', icon: 'library_books', route: '/kb-articles', adminOnly: true, feature: 'BASE_CONHECIMENTO' },
+    { key: 'faturamento', label: 'Faturamento', icon: 'request_quote', route: '/faturamento', adminOnly: true, feature: 'FATURAMENTO' },
+    { key: 'permissoes', label: 'Permissões', icon: 'admin_panel_settings', route: '/permissoes', adminOnly: true },
     { key: 'images', label: 'Imagens', icon: 'image', route: '/images', adminOnly: true },
   ];
 
@@ -64,6 +67,7 @@ export class ShellComponent implements OnInit {
     private user: UserService,
     private router: Router,
     private themeService: ThemeService,
+    private perm: PermissionsService,
     private host: ElementRef<HTMLElement>
   ) {}
 
@@ -99,7 +103,21 @@ export class ShellComponent implements OnInit {
     } catch {}
   }
 
-  isAdmin() { return this.type === 'ADMIN'; }
+  isAdmin() { return this.type === 'ADMIN' || this.perm.isAdmin(); }
+
+  // ADMIN vê tudo. Com feature: exige CONSULTA (permite usuário não-admin liberado).
+  // Sem feature: operacional aparece; adminOnly-sem-feature fica só p/ ADMIN.
+  visivel(item: NavItem): boolean {
+    if (this.isAdmin()) return true;
+    if (item.feature) return this.perm.can(item.feature, 'CONSULTA');
+    return !item.adminOnly;
+  }
+
+  // Mostra o grupo "Administração" se houver ao menos um item visível
+  // (ADMIN, ou usuário não-admin com permissão em alguma feature admin).
+  anyAdminVisible(): boolean {
+    return this.adminItems.some((i) => this.visivel(i));
+  }
 
   toggleCollapse() {
     this.collapsed.update(v => !v);

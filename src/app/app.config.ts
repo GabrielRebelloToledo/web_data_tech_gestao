@@ -1,4 +1,4 @@
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { APP_INITIALIZER, ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
@@ -12,6 +12,11 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { LocationStrategy, HashLocationStrategy } from '@angular/common';
 
 import { requestInterceptorFn } from '../app/components/core/auth/request.interceptor';
+import { PermissionsService } from '../app/components/core/permissions/permissions.service';
+
+function initPermissions(perm: PermissionsService): () => Promise<void> {
+  return () => perm.load();
+}
 
 
 
@@ -29,6 +34,12 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withFetch(), withInterceptors([requestInterceptorFn])),
     provideAnimationsAsync(),
     provideAnimationsAsync(),
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initPermissions,
+      deps: [PermissionsService],
+      multi: true
+    },
   ],
   
 };

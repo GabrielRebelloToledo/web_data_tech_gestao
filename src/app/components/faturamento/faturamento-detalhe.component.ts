@@ -8,6 +8,7 @@ import { EmptyStateComponent } from '../shared/empty-state/empty-state.component
 import { StatusChipComponent } from '../shared/status-chip/status-chip.component';
 import { SkeletonComponent } from '../shared/skeleton/skeleton.component';
 import { BillingService } from './billing.service';
+import { PermissionsService } from '../core/permissions/permissions.service';
 
 @Component({
   selector: 'app-faturamento-detalhe',
@@ -34,8 +35,17 @@ export class FaturamentoDetalheComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private billing: BillingService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    public perm: PermissionsService
   ) {}
+
+  canPay(): boolean {
+    return this.perm.can('FATURAMENTO', 'GERACAO');
+  }
+
+  canEstornar(): boolean {
+    return this.perm.can('FATURAMENTO', 'EXCLUSAO');
+  }
 
   ngOnInit(): void {
     this.id = this.route.snapshot.paramMap.get('id');

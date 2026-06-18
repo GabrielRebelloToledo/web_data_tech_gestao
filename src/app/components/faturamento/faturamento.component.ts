@@ -10,6 +10,7 @@ import { StatusChipComponent } from '../shared/status-chip/status-chip.component
 import { SkeletonComponent } from '../shared/skeleton/skeleton.component';
 import { ComboboxComponent } from '../shared/combobox/combobox.component';
 import { BillingService } from './billing.service';
+import { PermissionsService } from '../core/permissions/permissions.service';
 
 @Component({
   selector: 'app-faturamento',
@@ -70,8 +71,13 @@ export class FaturamentoComponent implements OnInit {
   constructor(
     private billing: BillingService,
     private router: Router,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    public perm: PermissionsService
   ) {}
+
+  canGenerateBilling(): boolean {
+    return this.perm.can('FATURAMENTO', 'GERACAO');
+  }
 
   ngOnInit(): void {
     this.loadCompanies();

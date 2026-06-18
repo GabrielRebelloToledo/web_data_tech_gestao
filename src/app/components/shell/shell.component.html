@@ -10,7 +10,7 @@
       <div class="nav-group">
         <span class="nav-label">Operação</span>
         <ul>
-          <li *ngFor="let item of operationalItems">
+          <li *ngFor="let item of operationalItems" [hidden]="!visivel(item)">
             <a class="nav-item"
                [class.nav-item--active]="activePage === item.key"
                (click)="handleItem(item)"
@@ -23,10 +23,10 @@
         </ul>
       </div>
 
-      <div class="nav-group" *ngIf="isAdmin()">
+      <div class="nav-group" *ngIf="anyAdminVisible()">
         <span class="nav-label">Administração</span>
         <ul>
-          <li *ngFor="let item of adminItems">
+          <li *ngFor="let item of adminItems" [hidden]="!visivel(item)">
             <a class="nav-item"
                [class.nav-item--active]="activePage === item.key"
                (click)="handleItem(item)"

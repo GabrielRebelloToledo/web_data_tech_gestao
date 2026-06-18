@@ -18,6 +18,7 @@ import { ProjetosComponent } from './components/projetos/projetos.component';
 import { ProjetoDetalheComponent } from './components/projetos/projeto-detalhe.component';
 import { FaturamentoComponent } from './components/faturamento/faturamento.component';
 import { FaturamentoDetalheComponent } from './components/faturamento/faturamento-detalhe.component';
+import { PermissoesComponent } from './components/permissoes/permissoes.component';
 
 export const routes: Routes = [
     { path: '', component: LoginComponent, canActivate: [LoginGuard] },
@@ -41,6 +42,7 @@ export const routes: Routes = [
     { path: 'usuarios', component: UsersComponent, canActivate: [AuthGuard] },
     { path: 'grupos-usuarios', component: UsergroupsComponent, canActivate: [AuthGuard] },
     { path: 'kb-articles', component: KbComponent, canActivate: [AuthGuard] },
+    { path: 'permissoes', component: PermissoesComponent, canActivate: [AuthGuard] },
 
     { path: 'relatorios', component: ListReportsComponent, canActivate: [AuthGuard] },
     { path: 'reports', component: ReportsComponent, canActivate: [AuthGuard] },
