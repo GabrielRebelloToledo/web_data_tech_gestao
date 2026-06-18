@@ -35,14 +35,22 @@
                   {{ field.placeholder }}
                   <span class="req-marker" *ngIf="field.required">*</span>
                 </span>
-                <input class="field__control"
+                <!-- Com máscara (cnpj/telefone): sempre texto + ngx-mask -->
+                <input *ngIf="field.mask" class="field__control"
+                       type="text"
+                       [formControlName]="field.name"
+                       [readonly]="field.readonly"
+                       [class.field__control--readonly]="field.readonly"
+                       [mask]="field.mask"
+                       [dropSpecialCharacters]="false"
+                       [validation]="false"
+                       [placeholder]="field.placeholder" />
+                <!-- Sem máscara: input normal (number/date/etc) -->
+                <input *ngIf="!field.mask" class="field__control"
                        [type]="field.type"
                        [formControlName]="field.name"
                        [readonly]="field.readonly"
                        [class.field__control--readonly]="field.readonly"
-                       [mask]="field.mask || ''"
-                       [dropSpecialCharacters]="false"
-                       [validation]="false"
                        [placeholder]="field.placeholder" />
                 <span class="field__helper" *ngIf="field.helper">{{ field.helper }}</span>
                 <span class="field__error"
