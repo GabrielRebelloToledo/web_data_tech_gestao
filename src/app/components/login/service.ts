@@ -23,9 +23,19 @@ export class LService {
 
 
   login(user: User) {
-    
+
     return this.http.post(`${API}sessions`, user ).pipe(take(1))
 
   }
-  
+
+  /** Primeiro acesso — passo 1: pede o código de 6 dígitos por e-mail. */
+  requestFirstAccess(email: string) {
+    return this.http.post(`${API}sessions/first-access/request`, { email }).pipe(take(1));
+  }
+
+  /** Primeiro acesso — passo 2: valida o código e define a senha. */
+  confirmFirstAccess(payload: { email: string; code: string; password: string }) {
+    return this.http.post(`${API}sessions/first-access/confirm`, payload).pipe(take(1));
+  }
+
 }

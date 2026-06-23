@@ -45,6 +45,11 @@ export class UsersService {
     return this.http.delete<any[]>(`${API}status/delete/${id}`, { headers: this.getHeaders() });
   }
 
+  /** Reenvia o e-mail de boas-vindas a um usuário existente. */
+  sendWelcome(id: any): Observable<any> {
+    return this.http.post(`${API}sessions/welcome/${id}`, {}, { headers: this.getHeaders() }).pipe(take(1));
+  }
+
 
   getUser(id:any): Observable<User> {
 

@@ -153,8 +153,8 @@ export class UsersComponent implements OnInit {
       },
       {
         headerName: 'Ações',
-        maxWidth: 180,
-        minWidth: 160,
+        maxWidth: 220,
+        minWidth: 200,
         flex: 0,
         sortable: false,
         filter: false,
@@ -170,6 +170,13 @@ export class UsersComponent implements OnInit {
           companiesBtn.innerHTML = `<span class="material-symbols-rounded icon-sm">business</span>`;
           companiesBtn.addEventListener('click', (e) => { e.stopPropagation(); this.openLinkageDrawer(u); });
           div.appendChild(companiesBtn);
+
+          const welcomeBtn = document.createElement('button');
+          welcomeBtn.className = 'row-action';
+          welcomeBtn.title = 'Enviar e-mail de boas-vindas';
+          welcomeBtn.innerHTML = `<span class="material-symbols-rounded icon-sm">mail</span>`;
+          welcomeBtn.addEventListener('click', (e) => { e.stopPropagation(); this.sendWelcome(u); });
+          div.appendChild(welcomeBtn);
 
           const editBtn = document.createElement('button');
           editBtn.className = 'row-action';
@@ -220,7 +227,8 @@ export class UsersComponent implements OnInit {
       fields: [
         { name: 'name', placeholder: 'Nome completo', type: 'text', required: true },
         { name: 'email', placeholder: 'E-mail', type: 'email', required: true },
-        { name: 'password', placeholder: 'Senha', type: 'password', required: true },
+        { name: 'password', placeholder: 'Senha', type: 'password', required: false,
+          helper: 'Opcional — deixe em branco para o usuário definir no Primeiro acesso.' },
         { name: 'telephone', placeholder: 'Telefone', type: 'text', required: true, mask: '(00) 0000-0000||(00) 00000-0000' },
         { name: 'department', placeholder: 'Departamento', type: 'select', optionsUrl: 'departments/list', required: true },
         { name: 'type', placeholder: 'Tipo', type: 'select', required: true, options: [
@@ -228,6 +236,11 @@ export class UsersComponent implements OnInit {
           { id: 'USER', name: 'Usuário' }
         ]},
         { name: 'active', placeholder: 'Ativo', type: 'select', required: true, defaultValue: 'S', options: [
+          { id: 'S', name: 'Sim' },
+          { id: 'N', name: 'Não' }
+        ]},
+        { name: 'sendWelcome', placeholder: 'Enviar e-mail de boas-vindas', type: 'select', required: false, defaultValue: 'S',
+          helper: 'Envia um e-mail de boas-vindas com o link para definir a senha.', options: [
           { id: 'S', name: 'Sim' },
           { id: 'N', name: 'Não' }
         ]}
@@ -329,6 +342,33 @@ export class UsersComponent implements OnInit {
       error: (err) => {
         const msg = err?.error?.products?.message || 'Usuário pode conter vínculos com outros processos.';
         this.snackBar.open('Não foi possível excluir: ' + msg, 'Fechar', {
+          duration: 3500, panelClass: ['snackbar-error']
+        });
+      }
+    });
+  }
+
+  sendWelcome(user: any) {
+    if (!confirm(`Enviar e-mail de boas-vindas para ${user.name}?`)) return;
+    this.service.sendWelcome(user.id).subscribe({
+      next: (res: any) => {
+        if (res?.skipped) {
+          this.snackBar.open('Nenhum ADMIN com SMTP configurado — e-mail não enviado.', 'Fechar', {
+            duration: 4000, panelClass: ['snackbar-error']
+          });
+        } else if (res?.sent === false) {
+          this.snackBar.open('Falha ao enviar: ' + (res?.error || 'erro de SMTP'), 'Fechar', {
+            duration: 4000, panelClass: ['snackbar-error']
+          });
+        } else {
+          this.snackBar.open('E-mail de boas-vindas enviado', 'Fechar', {
+            duration: 2500, panelClass: ['snackbar-success']
+          });
+        }
+      },
+      error: (err) => {
+        const msg = err?.error?.message?.message || 'Tente novamente.';
+        this.snackBar.open('Não foi possível enviar: ' + msg, 'Fechar', {
           duration: 3500, panelClass: ['snackbar-error']
         });
       }

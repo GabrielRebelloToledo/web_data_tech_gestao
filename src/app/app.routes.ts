@@ -19,9 +19,13 @@ import { ProjetoDetalheComponent } from './components/projetos/projeto-detalhe.c
 import { FaturamentoComponent } from './components/faturamento/faturamento.component';
 import { FaturamentoDetalheComponent } from './components/faturamento/faturamento-detalhe.component';
 import { PermissoesComponent } from './components/permissoes/permissoes.component';
+import { FirstAccessComponent } from './components/first-access/first-access.component';
 
 export const routes: Routes = [
     { path: '', component: LoginComponent, canActivate: [LoginGuard] },
+
+    // Público — primeiro acesso / definir senha via código de 6 dígitos
+    { path: 'primeiro-acesso', component: FirstAccessComponent },
 
     { path: 'inicio', component: HomeComponent, canActivate: [AuthGuard] },
 
