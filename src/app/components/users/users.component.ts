@@ -122,7 +122,7 @@ export class UsersComponent implements OnInit {
         minWidth: 130,
         flex: 0,
         filter: 'agTextColumnFilter',
-        valueGetter: (p) => p.data?.type === 'ADMIN' ? 'Administrador' : (p.data?.type === 'USER' ? 'Usuário' : p.data?.type)
+        valueGetter: (p) => ({ ADMIN: 'Administrador', GESTOR: 'Gestor', ANALISTA: 'Analista', USER: 'Usuário' } as any)[p.data?.type] || p.data?.type
       },
       {
         headerName: 'Departamento',
@@ -233,6 +233,8 @@ export class UsersComponent implements OnInit {
         { name: 'department', placeholder: 'Departamento', type: 'select', optionsUrl: 'departments/list', required: true },
         { name: 'type', placeholder: 'Tipo', type: 'select', required: true, options: [
           { id: 'ADMIN', name: 'Administrador' },
+          { id: 'GESTOR', name: 'Gestor' },
+          { id: 'ANALISTA', name: 'Analista' },
           { id: 'USER', name: 'Usuário' }
         ]},
         { name: 'active', placeholder: 'Ativo', type: 'select', required: true, defaultValue: 'S', options: [

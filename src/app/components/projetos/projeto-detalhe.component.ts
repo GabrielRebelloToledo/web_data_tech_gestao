@@ -194,7 +194,7 @@ export class ProjetoDetalheComponent implements OnInit {
       fields: [
         { name: 'title', placeholder: 'Título', type: 'text', required: true },
         { name: 'description', placeholder: 'Descrição', type: 'txtarea', required: false },
-        { name: 'responsibleUserId', placeholder: 'Responsável', type: 'select', required: false, optionsUrl: 'sessions/list', labelKey: 'name' },
+        { name: 'responsibleUserId', placeholder: 'Responsável', type: 'select', required: false, optionsUrl: 'sessions/salesman/list', labelKey: 'name' },
         { name: 'startDate', placeholder: 'Início', type: 'date', required: false },
         { name: 'dueDate', placeholder: 'Prazo', type: 'date', required: false },
         { name: 'status', placeholder: 'Status', type: 'select', required: true, defaultValue: 'PENDENTE', options: TASK_STATUS_OPTIONS },
@@ -226,7 +226,7 @@ export class ProjetoDetalheComponent implements OnInit {
       { name: 'id', placeholder: 'Cód.', type: 'number', required: true, visible: true, defaultValue: task.id },
       { name: 'title', placeholder: 'Título', type: 'text', required: true, defaultValue: task.title },
       { name: 'description', placeholder: 'Descrição', type: 'txtarea', required: false, defaultValue: task.description },
-      { name: 'responsibleUserId', placeholder: 'Responsável', type: 'select', required: false, optionsUrl: 'sessions/list', labelKey: 'name', defaultValue: task.responsibleUserId },
+      { name: 'responsibleUserId', placeholder: 'Responsável', type: 'select', required: false, optionsUrl: 'sessions/salesman/list', labelKey: 'name', defaultValue: task.responsibleUserId },
       { name: 'startDate', placeholder: 'Início', type: 'date', required: false, defaultValue: this.toInputDate(task.startDate) },
       { name: 'dueDate', placeholder: 'Prazo', type: 'date', required: false, defaultValue: this.toInputDate(task.dueDate) }
     ];

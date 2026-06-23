@@ -19,6 +19,8 @@ type NavItem = {
   action?: 'new-ticket';
   adminOnly?: boolean;
   feature?: string;
+  /** Papéis que veem o item (além de ADMIN). Usado p/ itens sem feature. */
+  roles?: string[];
 };
 
 @Component({
@@ -58,7 +60,7 @@ export class ShellComponent implements OnInit {
     { key: 'usergroups', label: 'Grupos de Usuários', icon: 'groups', route: '/grupos-usuarios', adminOnly: true, feature: 'USUARIOS' },
     { key: 'kb', label: 'Base de Conhecimento', icon: 'library_books', route: '/kb-articles', adminOnly: true, feature: 'BASE_CONHECIMENTO' },
     { key: 'faturamento', label: 'Faturamento', icon: 'request_quote', route: '/faturamento', adminOnly: true, feature: 'FATURAMENTO' },
-    { key: 'permissoes', label: 'Permissões', icon: 'admin_panel_settings', route: '/permissoes', adminOnly: true },
+    { key: 'permissoes', label: 'Permissões', icon: 'admin_panel_settings', route: '/permissoes', adminOnly: true, roles: ['GESTOR'] },
     { key: 'images', label: 'Imagens', icon: 'image', route: '/images', adminOnly: true },
   ];
 
@@ -110,6 +112,8 @@ export class ShellComponent implements OnInit {
   visivel(item: NavItem): boolean {
     if (this.isAdmin()) return true;
     if (item.feature) return this.perm.can(item.feature, 'CONSULTA');
+    // Itens sem feature liberados por papel (ex.: Permissões p/ GESTOR).
+    if (item.roles?.length) return item.roles.includes(this.type);
     return !item.adminOnly;
   }
 
