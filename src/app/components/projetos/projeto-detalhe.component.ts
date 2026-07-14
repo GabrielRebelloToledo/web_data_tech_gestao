@@ -143,10 +143,12 @@ export class ProjetoDetalheComponent implements OnInit {
       this.projetosService.listCalleds().subscribe({
         next: (data: any[]) => {
           this.availableCalleds = data || [];
-          this.linkOptions = this.availableCalleds.map((c: any) => ({
-            id: c.id,
-            name: `#${c.id} · ${c.reason || 'Sem motivo'}`
-          }));
+          this.linkOptions = this.availableCalleds.map((c: any) => {
+            const empresa = c.primaryCompanie?.name;
+            const setor = c.department?.department;
+            const parts = [`#${c.id}`, empresa, setor, c.reason || 'Sem motivo'].filter(Boolean);
+            return { id: c.id, name: parts.join(' · ') };
+          });
           this.loadingCalleds = false;
         },
         error: () => { this.loadingCalleds = false; }
