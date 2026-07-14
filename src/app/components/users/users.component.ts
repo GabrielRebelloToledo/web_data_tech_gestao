@@ -230,7 +230,8 @@ export class UsersComponent implements OnInit {
         { name: 'password', placeholder: 'Senha', type: 'password', required: false,
           helper: 'Opcional — deixe em branco para o usuário definir no Primeiro acesso.' },
         { name: 'telephone', placeholder: 'Telefone', type: 'text', required: true, mask: '(00) 0000-0000||(00) 00000-0000' },
-        { name: 'department', placeholder: 'Departamento', type: 'select', optionsUrl: 'departments/list', required: true },
+        { name: 'anydesk', placeholder: 'Cód. do AnyDesk', type: 'number', required: false,
+          helper: 'Pré-preenche o campo AnyDesk na abertura de chamado do usuário.' },
         { name: 'type', placeholder: 'Tipo', type: 'select', required: true, options: [
           { id: 'ADMIN', name: 'Administrador' },
           { id: 'GESTOR', name: 'Gestor' },
@@ -273,7 +274,8 @@ export class UsersComponent implements OnInit {
         { name: 'email', placeholder: 'E-mail', type: 'email', required: true, defaultValue: user.email },
         { name: 'password', placeholder: 'Nova senha (deixe em branco para não alterar)', type: 'password', required: false },
         { name: 'telephone', placeholder: 'Telefone', type: 'text', required: true, mask: '(00) 0000-0000||(00) 00000-0000', defaultValue: user.telephone },
-        { name: 'department', placeholder: 'Departamento', type: 'select', optionsUrl: 'departments/list', required: true, defaultValue: user.department },
+        { name: 'anydesk', placeholder: 'Cód. do AnyDesk', type: 'number', required: false, defaultValue: user.anydesk,
+          helper: 'Pré-preenche o campo AnyDesk na abertura de chamado do usuário.' },
         { name: 'type', placeholder: 'Tipo', type: 'select', required: true, defaultValue: user.type, options: [
           { id: 'ADMIN', name: 'Administrador' },
           { id: 'USER', name: 'Usuário' }

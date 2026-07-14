@@ -3,10 +3,12 @@ export interface User {
     password: string,
     name: string,
     telephone: string,
+    anydesk?: string,
     email: string,
     companieId: number,
     department: number,
     type: string,
-    active: string
+    active: string,
+    isSuperAdmin?: boolean
 
 }

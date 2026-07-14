@@ -191,6 +191,22 @@ export class CompaniesComponent implements OnInit {
         { name: 'aiApiKey', placeholder: 'Chave de API da IA (opcional)', type: 'password', required: false, helper: 'Vazio = usa a chave global do sistema.' },
         { name: 'valorHora', placeholder: 'Valor da hora (R$)', type: 'number', required: false, helper: 'Usado no faturamento (horas × valor).' },
       ]
+    }, {
+      title: 'Configurações de SMTP',
+      fields: [
+        { name: 'smtpHost', placeholder: 'Servidor SMTP', type: 'text', required: false,
+          helper: 'Remetente próprio da empresa. Vazio = usa o SMTP geral da plataforma.' },
+        { name: 'smtpPort', placeholder: 'Porta', type: 'number', required: false, helper: '587 (STARTTLS) ou 465 (SSL).' },
+        { name: 'smtpSecure', placeholder: 'Conexão segura (SSL)', type: 'select', required: false, options: [
+          { id: '', name: 'Auto (padrão pela porta)' },
+          { id: true, name: 'Sim (SSL — porta 465)' },
+          { id: false, name: 'Não (STARTTLS — porta 587)' }
+        ]},
+        { name: 'smtpUser', placeholder: 'Usuário / E-mail', type: 'text', required: false },
+        { name: 'smtpPass', placeholder: 'Senha', type: 'password', required: false, helper: 'Para Gmail use uma Senha de app.' },
+        { name: 'smtpFromEmail', placeholder: 'E-mail do remetente', type: 'email', required: false, helper: 'Vazio = usa o Usuário/E-mail acima.' },
+        { name: 'smtpFromName', placeholder: 'Nome do remetente', type: 'text', required: false },
+      ]
     }];
 
     const dialogRef = this.dialog.open(FormComponent, {
@@ -227,6 +243,22 @@ export class CompaniesComponent implements OnInit {
         { name: 'aiConfidenceThreshold', placeholder: 'Confiança mínima (%)', type: 'number', required: false, defaultValue: company.aiConfidenceThreshold ?? 75 },
         { name: 'aiApiKey', placeholder: 'Chave de API da IA', type: 'password', required: false, helper: 'Vazio = mantém a chave atual / usa a global.' },
         { name: 'valorHora', placeholder: 'Valor da hora (R$)', type: 'number', required: false, defaultValue: company.valorHora ?? '', helper: 'Usado no faturamento (horas × valor).' }
+      ]
+    }, {
+      title: 'Configurações de SMTP',
+      fields: [
+        { name: 'smtpHost', placeholder: 'Servidor SMTP', type: 'text', required: false, defaultValue: company.smtpHost || '',
+          helper: 'Remetente próprio da empresa. Vazio = usa o SMTP geral da plataforma.' },
+        { name: 'smtpPort', placeholder: 'Porta', type: 'number', required: false, defaultValue: company.smtpPort ?? '', helper: '587 (STARTTLS) ou 465 (SSL).' },
+        { name: 'smtpSecure', placeholder: 'Conexão segura (SSL)', type: 'select', required: false, defaultValue: company.smtpSecure ?? '', options: [
+          { id: '', name: 'Auto (padrão pela porta)' },
+          { id: true, name: 'Sim (SSL — porta 465)' },
+          { id: false, name: 'Não (STARTTLS — porta 587)' }
+        ]},
+        { name: 'smtpUser', placeholder: 'Usuário / E-mail', type: 'text', required: false, defaultValue: company.smtpUser || '' },
+        { name: 'smtpPass', placeholder: 'Senha (deixe em branco para manter)', type: 'password', required: false, helper: 'Para Gmail use uma Senha de app.' },
+        { name: 'smtpFromEmail', placeholder: 'E-mail do remetente', type: 'email', required: false, defaultValue: company.smtpFromEmail || '', helper: 'Vazio = usa o Usuário/E-mail acima.' },
+        { name: 'smtpFromName', placeholder: 'Nome do remetente', type: 'text', required: false, defaultValue: company.smtpFromName || '' },
       ]
     }];
 

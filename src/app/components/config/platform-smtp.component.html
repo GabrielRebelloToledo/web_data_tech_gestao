@@ -1,0 +1,92 @@
+<app-shell activePage="config-smtp" pageTitle="SMTP da Plataforma">
+  <div class="smtp-page">
+    <div class="smtp-card">
+      <header class="smtp-card__head">
+        <div class="smtp-card__icon"><span class="material-symbols-rounded">mail_lock</span></div>
+        <div>
+          <h2 class="smtp-card__title">SMTP geral da plataforma</h2>
+          <p class="smtp-card__subtitle">
+            Remetente-padrão usado nos e-mails do sistema (boas-vindas, primeiro acesso, fechamento)
+            quando nenhum atendente/empresa tem SMTP próprio configurado.
+          </p>
+        </div>
+      </header>
+
+      @if (loading()) {
+        <div class="smtp-skel">
+          <app-skeleton height="46px"></app-skeleton>
+          <app-skeleton height="46px"></app-skeleton>
+          <app-skeleton height="46px"></app-skeleton>
+          <app-skeleton height="46px"></app-skeleton>
+        </div>
+      } @else {
+        <form class="smtp-form" (ngSubmit)="save()">
+          <div class="smtp-grid">
+            <label class="field">
+              <span class="field__label">Servidor SMTP</span>
+              <input class="field__input" type="text" name="smtpHost" [(ngModel)]="model.smtpHost"
+                     placeholder="smtp.gmail.com, smtp.office365.com…" autocomplete="off" />
+              <span class="field__hint">Deixe em branco para desativar o SMTP geral.</span>
+            </label>
+
+            <label class="field">
+              <span class="field__label">Porta</span>
+              <input class="field__input" type="number" name="smtpPort" [(ngModel)]="model.smtpPort"
+                     placeholder="587 ou 465" />
+              <span class="field__hint">587 (STARTTLS) ou 465 (SSL).</span>
+            </label>
+
+            <label class="field">
+              <span class="field__label">Conexão segura (SSL)</span>
+              <select class="field__input" name="smtpSecure" [(ngModel)]="model.smtpSecure">
+                <option [ngValue]="''">Auto (padrão pela porta)</option>
+                <option [ngValue]="true">Sim (SSL — porta 465)</option>
+                <option [ngValue]="false">Não (STARTTLS — porta 587)</option>
+              </select>
+            </label>
+
+            <label class="field">
+              <span class="field__label">Usuário / E-mail</span>
+              <input class="field__input" type="text" name="smtpUser" [(ngModel)]="model.smtpUser"
+                     placeholder="conta@dominio.com" autocomplete="off" />
+            </label>
+
+            <label class="field">
+              <span class="field__label">Senha</span>
+              <input class="field__input" type="password" name="smtpPass" [(ngModel)]="model.smtpPass"
+                     [placeholder]="hasPass() ? '•••••••• (mantida) — digite para alterar' : 'Senha ou App Password'"
+                     autocomplete="new-password" />
+              <span class="field__hint">
+                {{ hasPass() ? 'Já existe uma senha salva. Deixe em branco para manter.' : 'Para Gmail use uma Senha de app.' }}
+              </span>
+            </label>
+
+            <label class="field">
+              <span class="field__label">E-mail do remetente</span>
+              <input class="field__input" type="email" name="smtpFromEmail" [(ngModel)]="model.smtpFromEmail"
+                     placeholder="naoresponda@datatechsistemas.com.br" autocomplete="off" />
+              <span class="field__hint">Se vazio, usa o Usuário/E-mail acima.</span>
+            </label>
+
+            <label class="field">
+              <span class="field__label">Nome do remetente</span>
+              <input class="field__input" type="text" name="smtpFromName" [(ngModel)]="model.smtpFromName"
+                     placeholder="DataTech Sistemas" autocomplete="off" />
+            </label>
+          </div>
+
+          <div class="smtp-actions">
+            <button type="button" class="btn btn--ghost" (click)="saveAndTest()" [disabled]="saving() || testing()">
+              <span class="material-symbols-rounded">wifi_tethering</span>
+              {{ testing() ? 'Testando…' : 'Salvar e testar conexão' }}
+            </button>
+            <button type="submit" class="btn btn--primary" [disabled]="saving() || testing()">
+              <span class="material-symbols-rounded">check</span>
+              {{ saving() ? 'Salvando…' : 'Salvar' }}
+            </button>
+          </div>
+        </form>
+      }
+    </div>
+  </div>
+</app-shell>

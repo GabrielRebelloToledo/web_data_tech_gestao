@@ -18,6 +18,8 @@ type NavItem = {
   route?: string;
   action?: 'new-ticket';
   adminOnly?: boolean;
+  /** Só o super admin (dono da plataforma) vê o item. Tem prioridade sobre adminOnly. */
+  superAdminOnly?: boolean;
   feature?: string;
   /** Papéis que veem o item (além de ADMIN). Usado p/ itens sem feature. */
   roles?: string[];
@@ -38,6 +40,7 @@ export class ShellComponent implements OnInit {
   usuario = '';
   idUser: any;
   type: any;
+  isSuperAdmin = false;
   userInitials = '';
 
   collapsed = signal(false);
@@ -61,6 +64,7 @@ export class ShellComponent implements OnInit {
     { key: 'kb', label: 'Base de Conhecimento', icon: 'library_books', route: '/kb-articles', adminOnly: true, feature: 'BASE_CONHECIMENTO' },
     { key: 'faturamento', label: 'Faturamento', icon: 'request_quote', route: '/faturamento', adminOnly: true, feature: 'FATURAMENTO' },
     { key: 'permissoes', label: 'Permissões', icon: 'admin_panel_settings', route: '/permissoes', adminOnly: true, roles: ['GESTOR'] },
+    { key: 'config-smtp', label: 'SMTP da Plataforma', icon: 'mail_lock', route: '/config/smtp', superAdminOnly: true },
     { key: 'images', label: 'Imagens', icon: 'image', route: '/images', adminOnly: true },
   ];
 
@@ -92,6 +96,7 @@ export class ShellComponent implements OnInit {
     this.usuario = this.user.user?.name || '';
     this.idUser = this.user.user?.id;
     this.type = this.user.user?.type;
+    this.isSuperAdmin = !!(this.user.user as any)?.isSuperAdmin;
     this.userInitials = (this.usuario || '?')
       .split(' ')
       .filter(Boolean)
@@ -110,6 +115,8 @@ export class ShellComponent implements OnInit {
   // ADMIN vê tudo. Com feature: exige CONSULTA (permite usuário não-admin liberado).
   // Sem feature: operacional aparece; adminOnly-sem-feature fica só p/ ADMIN.
   visivel(item: NavItem): boolean {
+    // Itens exclusivos do super admin — nem todo ADMIN vê.
+    if (item.superAdminOnly) return this.isSuperAdmin;
     if (this.isAdmin()) return true;
     if (item.feature) return this.perm.can(item.feature, 'CONSULTA');
     // Itens sem feature liberados por papel (ex.: Permissões p/ GESTOR).
@@ -146,13 +153,15 @@ export class ShellComponent implements OnInit {
 
   openNewTicket() {
     const id = this.user.user.id;
+    // Prefill dinâmico a partir do cadastro do usuário logado (vindos no token).
+    const u = this.user.user as any;
 
     const formConfig: TabConfig[] = [{
       title: 'Abertura de Chamado',
       fields: [
         { name: 'userId', placeholder: 'Cód. do Usuário', type: 'number', required: true, readonly: true },
-        { name: 'anydesk', placeholder: 'Cód. do AnyDesk', type: 'number', required: true },
-        { name: 'telephone', placeholder: 'Telefone de Contato', type: 'text', required: true, mask: '(00) 0000-0000||(00) 00000-0000' },
+        { name: 'anydesk', placeholder: 'Cód. do AnyDesk', type: 'number', required: true, defaultValue: u?.anydesk ?? '' },
+        { name: 'telephone', placeholder: 'Telefone de Contato', type: 'text', required: true, mask: '(00) 0000-0000||(00) 00000-0000', defaultValue: u?.telephone ?? '' },
         { name: 'status', placeholder: 'Status', type: 'select', optionsUrl: `status/list`, required: true, visible: true, defaultValueName: 'Aguardando' },
         { name: 'companieIdP', placeholder: 'Empresa Abertura', type: 'select', optionsUrl: `usercompanies/show/${id}`, required: true },
         { name: 'idDepCall', placeholder: 'Chamado para', type: 'select', optionsUrl: `compdepuser/listdepcall/${id}`, required: true },

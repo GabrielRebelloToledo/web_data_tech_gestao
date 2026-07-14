@@ -3,6 +3,7 @@
     "/",
     "/cabreport",
     "/companies",
+    "/config/smtp",
     "/faturamento",
     "/grupos-usuarios",
     "/images",

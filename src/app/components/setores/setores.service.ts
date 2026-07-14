@@ -58,6 +58,10 @@ export class SetoresService {
     return this.http.post<any>(`${API}departments/`, payload, { headers: this.getHeaders() });
   }
 
+  updateCatalogItem(id: any, name: string): Observable<any> {
+    return this.http.put<any>(`${API}departments/update/${id}`, { name }, { headers: this.getHeaders() });
+  }
+
   deleteCatalogItem(id: any): Observable<any> {
     return this.http.delete<any>(`${API}departments/delete/${id}`, { headers: this.getHeaders() });
   }
