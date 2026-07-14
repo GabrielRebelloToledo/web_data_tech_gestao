@@ -143,17 +143,35 @@ export class ProjetoDetalheComponent implements OnInit {
       this.projetosService.listCalleds().subscribe({
         next: (data: any[]) => {
           this.availableCalleds = data || [];
-          this.linkOptions = this.availableCalleds.map((c: any) => {
-            const empresa = c.primaryCompanie?.name;
-            const setor = c.department?.department;
-            const parts = [`#${c.id}`, empresa, setor, c.reason || 'Sem motivo'].filter(Boolean);
-            return { id: c.id, name: parts.join(' · ') };
-          });
+          this.rebuildLinkOptions();
           this.loadingCalleds = false;
         },
         error: () => { this.loadingCalleds = false; }
       });
+    } else {
+      // Lista já em cache: recomputa p/ refletir vínculos feitos nesta sessão.
+      this.rebuildLinkOptions();
     }
+  }
+
+  // Monta as opções do seletor escondendo chamados FECHADOS (status close='S':
+  // Concluído/Cancelado) e os JÁ VINCULADOS a qualquer tarefa deste projeto.
+  private rebuildLinkOptions() {
+    const linkedIds = new Set<number>();
+    for (const t of (this.project?.tasks || [])) {
+      for (const l of (t.calleds || [])) {
+        if (l?.call?.id != null) linkedIds.add(Number(l.call.id));
+      }
+    }
+    this.linkOptions = this.availableCalleds
+      .filter((c: any) => c.statusId?.close !== 'S')
+      .filter((c: any) => !linkedIds.has(Number(c.id)))
+      .map((c: any) => {
+        const empresa = c.primaryCompanie?.name;
+        const setor = c.department?.department;
+        const parts = [`#${c.id}`, empresa, setor, c.reason || 'Sem motivo'].filter(Boolean);
+        return { id: c.id, name: parts.join(' · ') };
+      });
   }
 
   addTaskCalled(taskId: number) {
